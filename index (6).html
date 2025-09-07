@@ -1,0 +1,1728 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tedo's Football Lounge - Smoove Spots Fantasy Platform</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        :root {
+            --primary-teal: #2D5A5A;
+            --accent-yellow: #FFD700;
+            --dark-navy: #1a365d;
+            --light-teal: #4FD1C7;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--primary-teal) 0%, var(--dark-navy) 100%);
+            min-height: 100vh;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, var(--accent-yellow), #FFA500);
+            color: #1a1a1a;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 215, 0, 0.3);
+        }
+
+        .nav-tab {
+            transition: all 0.3s ease;
+            border-bottom: 2px solid transparent;
+        }
+
+        .nav-tab.active {
+            border-bottom-color: var(--accent-yellow);
+            color: var(--accent-yellow);
+        }
+
+        .team-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .team-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .team-card.selected {
+            border: 2px solid var(--accent-yellow);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+        }
+
+        .mobile-menu {
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+        }
+
+        .mobile-menu.open {
+            transform: translateX(0);
+        }
+
+        .dropdown-dark {
+            background-color: var(--dark-navy);
+            color: var(--accent-yellow);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+        }
+
+        .dropdown-dark option {
+            background-color: var(--dark-navy);
+            color: white;
+        }
+
+        .avatar-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+            gap: 10px;
+        }
+
+        .avatar-option {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .avatar-option:hover, .avatar-option.selected {
+            border-color: var(--accent-yellow);
+            transform: scale(1.1);
+        }
+
+        .leaderboard-position {
+            background: linear-gradient(45deg, rgba(255, 215, 0, 0.1), rgba(255, 215, 0, 0.05));
+        }
+
+        @media (max-width: 768px) {
+            .nav-tabs {
+                display: none;
+            }
+            
+            .mobile-nav {
+                display: block;
+            }
+        }
+
+        @media (min-width: 769px) {
+            .mobile-nav {
+                display: none;
+            }
+        }
+
+        .pwa-install {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body class="text-white">
+    <!-- PWA Install Prompt -->
+    <div id="pwaInstall" class="pwa-install hidden">
+        <button id="installBtn" class="btn-primary px-4 py-2 rounded-lg shadow-lg">
+            <i class="fas fa-download mr-2"></i>Install App
+        </button>
+    </div>
+
+    <!-- Header -->
+    <header class="glass-card sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-3">
+            <div class="flex items-center justify-between">
+                <!-- Logo -->
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-yellow-400 rounded-lg flex items-center justify-center text-black font-bold">
+                        TSL
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold text-yellow-400">Tedo's Sports Lounge</h1>
+                        <p class="text-xs text-gray-300">Smoove Spots NFL & NCAA Football</p>
+                    </div>
+                </div>
+
+                <!-- Desktop Navigation -->
+                <nav class="nav-tabs hidden md:flex space-x-6">
+                    <button class="nav-tab active px-3 py-2" data-tab="lounge">
+                        <i class="fas fa-home mr-2"></i>Lounge
+                    </button>
+                    <button class="nav-tab px-3 py-2" data-tab="nfl-picks">
+                        <i class="fas fa-football-ball mr-2"></i>Picks • NFL
+                    </button>
+                    <button class="nav-tab px-3 py-2" data-tab="ncaa-picks">
+                        <i class="fas fa-graduation-cap mr-2"></i>Picks • NCAA
+                    </button>
+                    <button class="nav-tab px-3 py-2" data-tab="leaderboards">
+                        <i class="fas fa-trophy mr-2"></i>Leaderboards
+                    </button>
+                    <button class="nav-tab px-3 py-2" data-tab="profile">
+                        <i class="fas fa-user mr-2"></i>Profile
+                    </button>
+                    <button class="nav-tab px-3 py-2" data-tab="feedback">
+                        <i class="fas fa-comment mr-2"></i>Tester Feedback
+                    </button>
+                </nav>
+
+                <!-- Mobile Menu Button -->
+                <button class="mobile-nav md:hidden" id="mobileMenuBtn">
+                    <i class="fas fa-bars text-2xl"></i>
+                </button>
+
+                <!-- User Info -->
+                <div class="hidden md:flex items-center space-x-4">
+                    <div id="userInfo" class="text-sm">
+                        <span id="userGreeting">Welcome!</span>
+                        <div class="text-yellow-400">
+                            <i class="fas fa-coins mr-1"></i>
+                            <span id="coinBalance">0</span> Smoove Coins
+                        </div>
+                    </div>
+                    <button id="authBtn" class="btn-primary px-4 py-2 rounded-lg">
+                        Login
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Navigation Menu -->
+        <div id="mobileMenu" class="mobile-menu fixed inset-y-0 left-0 w-64 glass-card z-50 p-4">
+            <div class="flex justify-between items-center mb-8">
+                <h2 class="text-xl font-bold text-yellow-400">Menu</h2>
+                <button id="closeMobileMenu">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <nav class="space-y-4">
+                <button class="mobile-tab w-full text-left px-4 py-3 rounded-lg hover:bg-white hover:bg-opacity-10" data-tab="lounge">
+                    <i class="fas fa-home mr-3"></i>Lounge
+                </button>
+                <button class="mobile-tab w-full text-left px-4 py-3 rounded-lg hover:bg-white hover:bg-opacity-10" data-tab="nfl-picks">
+                    <i class="fas fa-football-ball mr-3"></i>NFL Picks
+                </button>
+                <button class="mobile-tab w-full text-left px-4 py-3 rounded-lg hover:bg-white hover:bg-opacity-10" data-tab="ncaa-picks">
+                    <i class="fas fa-graduation-cap mr-3"></i>NCAA Picks
+                </button>
+                <button class="mobile-tab w-full text-left px-4 py-3 rounded-lg hover:bg-white hover:bg-opacity-10" data-tab="leaderboards">
+                    <i class="fas fa-trophy mr-3"></i>Leaderboards
+                </button>
+                <button class="mobile-tab w-full text-left px-4 py-3 rounded-lg hover:bg-white hover:bg-opacity-10" data-tab="profile">
+                    <i class="fas fa-user mr-3"></i>Profile
+                </button>
+                <button class="mobile-tab w-full text-left px-4 py-3 rounded-lg hover:bg-white hover:bg-opacity-10" data-tab="feedback">
+                    <i class="fas fa-comment mr-3"></i>Feedback
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-6">
+        <!-- Authentication Modal -->
+        <div id="authModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+            <div class="glass-card rounded-xl p-6 w-full max-w-md">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 id="authTitle" class="text-2xl font-bold text-yellow-400">Login</h2>
+                    <button id="closeAuthModal">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+                
+                <form id="authForm">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Email</label>
+                            <input type="email" id="authEmail" required class="w-full px-4 py-2 rounded-lg bg-gray-800 border border-gray-600 focus:border-yellow-400 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Password</label>
+                            <input type="password" id="authPassword" required class="w-full px-4 py-2 rounded-lg bg-gray-800 border border-gray-600 focus:border-yellow-400 focus:outline-none">
+                        </div>
+                        <div id="signupFields" class="hidden space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium mb-2">Confirm Password</label>
+                                <input type="password" id="confirmPassword" class="w-full px-4 py-2 rounded-lg bg-gray-800 border border-gray-600 focus:border-yellow-400 focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-2">Display Name</label>
+                                <input type="text" id="displayName" class="w-full px-4 py-2 rounded-lg bg-gray-800 border border-gray-600 focus:border-yellow-400 focus:outline-none">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn-primary w-full py-3 rounded-lg mt-6">
+                        <span id="authSubmitText">Login</span>
+                    </button>
+                </form>
+                
+                <div class="text-center mt-4">
+                    <button id="toggleAuth" class="text-yellow-400 hover:underline">
+                        <span id="toggleAuthText">Don't have an account? Sign up</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lounge Tab -->
+        <div id="lounge" class="tab-content">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Welcome Section -->
+                <div class="lg:col-span-2">
+                    <div class="glass-card rounded-xl p-6 mb-6">
+                        <h2 class="text-3xl font-bold text-yellow-400 mb-4">Welcome to Tedo's Sports Lounge</h2>
+                        <p class="text-gray-300 mb-6">Your premier destination for NFL and NCAA football picks. Join the community, make your predictions, and climb the leaderboards!</p>
+                        <div class="flex flex-wrap gap-4">
+                            <button class="btn-primary px-6 py-3 rounded-lg" onclick="showTab('nfl-picks')">
+                                <i class="fas fa-football-ball mr-2"></i>Make NFL Picks
+                            </button>
+                            <button class="btn-primary px-6 py-3 rounded-lg" onclick="showTab('leaderboards')">
+                                <i class="fas fa-trophy mr-2"></i>View Leaderboards
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Weekly Highlights -->
+                    <div class="glass-card rounded-xl p-6">
+                        <h3 class="text-xl font-bold text-yellow-400 mb-4">
+                            <i class="fas fa-fire mr-2"></i>This Week's Epic Games
+                        </h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg p-4">
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="font-bold">Kansas City Chiefs</span>
+                                    <span class="text-sm">@</span>
+                                    <span class="font-bold">Philadelphia Eagles</span>
+                                </div>
+                                <p class="text-sm text-gray-300">Sunday 4:25 PM</p>
+                                <p class="text-xs text-yellow-400 mt-1">Championship rematch!</p>
+                            </div>
+                            <div class="bg-gradient-to-r from-green-600 to-blue-600 rounded-lg p-4">
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="font-bold">Buffalo Bills</span>
+                                    <span class="text-sm">@</span>
+                                    <span class="font-bold">Baltimore Ravens</span>
+                                </div>
+                                <p class="text-sm text-gray-300">Sunday 8:20 PM</p>
+                                <p class="text-xs text-yellow-400 mt-1">AFC powerhouse battle!</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sidebar -->
+                <div class="space-y-6">
+                    <!-- Current Leaderboard -->
+                    <div class="glass-card rounded-xl p-6">
+                        <h3 class="text-xl font-bold text-yellow-400 mb-4">
+                            <i class="fas fa-trophy mr-2"></i>Top Performers
+                        </h3>
+                        <div id="topPerformers" class="space-y-3">
+                            <div class="flex items-center justify-between leaderboard-position rounded-lg p-3">
+                                <div class="flex items-center space-x-3">
+                                    <span class="text-yellow-400 font-bold">1</span>
+                                    <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-xs">GG</div>
+                                    <span>GridironGuru</span>
+                                </div>
+                                <span class="text-yellow-400 font-bold">85 pts</span>
+                            </div>
+                            <div class="flex items-center justify-between leaderboard-position rounded-lg p-3">
+                                <div class="flex items-center space-x-3">
+                                    <span class="text-gray-400 font-bold">2</span>
+                                    <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center text-xs">TM</div>
+                                    <span>TedoMaster</span>
+                                </div>
+                                <span class="text-yellow-400 font-bold">75 pts</span>
+                            </div>
+                            <div class="flex items-center justify-between leaderboard-position rounded-lg p-3">
+                                <div class="flex items-center space-x-3">
+                                    <span class="text-orange-400 font-bold">3</span>
+                                    <div class="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center text-xs">SS</div>
+                                    <span>SmooveSpots</span>
+                                </div>
+                                <span class="text-yellow-400 font-bold">70 pts</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Smoove Spots Videos -->
+                    <div class="glass-card rounded-xl p-6">
+                        <h3 class="text-xl font-bold text-yellow-400 mb-4">
+                            <i class="fab fa-youtube mr-2"></i>Smoove Spots Videos
+                        </h3>
+                        <div class="space-y-4">
+                            <div class="bg-gray-800 rounded-lg p-3 cursor-pointer hover:bg-gray-700 transition-colors">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-16 h-12 bg-red-600 rounded flex items-center justify-center">
+                                        <i class="fab fa-youtube text-white"></i>
+                                    </div>
+                                    <div class="flex-1">
+                                        <p class="text-sm font-medium">Week 2 NFL Highlights</p>
+                                        <p class="text-xs text-gray-400">2 hours ago</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="bg-gray-800 rounded-lg p-3 cursor-pointer hover:bg-gray-700 transition-colors">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-16 h-12 bg-red-600 rounded flex items-center justify-center">
+                                        <i class="fab fa-youtube text-white"></i>
+                                    </div>
+                                    <div class="flex-1">
+                                        <p class="text-sm font-medium">College Football Recap</p>
+                                        <p class="text-xs text-gray-400">1 day ago</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- NFL Picks Tab -->
+        <div id="nfl-picks" class="tab-content hidden">
+            <div class="glass-card rounded-xl p-6">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+                    <div>
+                        <h2 class="text-2xl font-bold text-yellow-400 mb-2">NFL Weekly Picks</h2>
+                        <p class="text-gray-300">Make your predictions and earn Smoove Coins!</p>
+                    </div>
+                    <div class="mt-4 md:mt-0">
+                        <label class="block text-sm font-medium mb-2">Select Week:</label>
+                        <select id="weekSelector" class="dropdown-dark px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400">
+                            <option value="1">Week 1</option>
+                            <option value="2">Week 2</option>
+                            <option value="3">Week 3</option>
+                            <option value="4">Week 4</option>
+                            <option value="5">Week 5</option>
+                            <option value="6">Week 6</option>
+                            <option value="7">Week 7</option>
+                            <option value="8">Week 8</option>
+                            <option value="9">Week 9</option>
+                            <option value="10">Week 10</option>
+                            <option value="11">Week 11</option>
+                            <option value="12">Week 12</option>
+                            <option value="13">Week 13</option>
+                            <option value="14">Week 14</option>
+                            <option value="15">Week 15</option>
+                            <option value="16">Week 16</option>
+                            <option value="17">Week 17</option>
+                            <option value="18">Week 18</option>
+                            <option value="wildcard">Wild Card</option>
+                            <option value="divisional">Divisional</option>
+                            <option value="conference">Conference Championship</option>
+                            <option value="superbowl">Super Bowl</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="nflGames" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <!-- Games will be populated by JavaScript -->
+                </div>
+
+                <div class="mt-6 flex justify-center">
+                    <button id="savePicksBtn" class="btn-primary px-8 py-3 rounded-lg disabled:opacity-50" disabled>
+                        <i class="fas fa-save mr-2"></i>Save Picks
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- NCAA Picks Tab -->
+        <div id="ncaa-picks" class="tab-content hidden">
+            <div class="glass-card rounded-xl p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <div>
+                        <h2 class="text-2xl font-bold text-yellow-400 mb-2">NCAA Weekly Picks</h2>
+                        <p class="text-gray-300">Premium feature - Select your favorite college teams!</p>
+                    </div>
+                    <div class="bg-gradient-to-r from-yellow-400 to-yellow-600 px-4 py-2 rounded-lg text-black font-bold">
+                        <i class="fas fa-crown mr-2"></i>PREMIUM
+                    </div>
+                </div>
+
+                <div id="ncaaContent">
+                    <div id="ncaaLocked" class="text-center py-12">
+                        <div class="mb-6">
+                            <i class="fas fa-lock text-6xl text-gray-400 mb-4"></i>
+                            <h3 class="text-2xl font-bold text-gray-300 mb-2">Premium Feature</h3>
+                            <p class="text-gray-400">Upgrade to Lounge Pass to access NCAA picks for your favorite teams!</p>
+                        </div>
+                        <button class="btn-primary px-8 py-4 rounded-lg" onclick="showTab('profile')">
+                            <i class="fas fa-crown mr-2"></i>Upgrade to Premium
+                        </button>
+                    </div>
+
+                    <div id="ncaaUnlocked" class="hidden">
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <div class="team-card glass-card rounded-xl p-6 text-center">
+                                <div class="w-16 h-16 bg-red-600 rounded-full mx-auto mb-4 flex items-center justify-center text-white font-bold text-xl">USC</div>
+                                <h3 class="font-bold text-lg mb-2">USC Trojans</h3>
+                                <p class="text-sm text-gray-300 mb-4">vs Stanford Cardinal</p>
+                                <p class="text-xs text-yellow-400">Saturday 3:30 PM</p>
+                                <button class="btn-primary w-full mt-4 py-2 rounded-lg">Make Pick</button>
+                            </div>
+                            
+                            <div class="team-card glass-card rounded-xl p-6 text-center">
+                                <div class="w-16 h-16 bg-yellow-600 rounded-full mx-auto mb-4 flex items-center justify-center text-black font-bold text-sm">PUR</div>
+                                <h3 class="font-bold text-lg mb-2">Purdue Boilermakers</h3>
+                                <p class="text-sm text-gray-300 mb-4">vs Indiana Hoosiers</p>
+                                <p class="text-xs text-yellow-400">Saturday 12:00 PM</p>
+                                <button class="btn-primary w-full mt-4 py-2 rounded-lg">Make Pick</button>
+                            </div>
+                            
+                            <div class="team-card glass-card rounded-xl p-6 text-center">
+                                <div class="w-16 h-16 bg-blue-800 rounded-full mx-auto mb-4 flex items-center justify-center text-yellow-400 font-bold text-sm">ND</div>
+                                <h3 class="font-bold text-lg mb-2">Notre Dame</h3>
+                                <p class="text-sm text-gray-300 mb-4">vs Navy Midshipmen</p>
+                                <p class="text-xs text-yellow-400">Saturday 7:30 PM</p>
+                                <button class="btn-primary w-full mt-4 py-2 rounded-lg">Make Pick</button>
+                            </div>
+                            
+                            <div class="team-card glass-card rounded-xl p-6 text-center">
+                                <div class="w-16 h-16 bg-red-700 rounded-full mx-auto mb-4 flex items-center justify-center text-white font-bold text-lg">G</div>
+                                <h3 class="font-bold text-lg mb-2">Georgia Bulldogs</h3>
+                                <p class="text-sm text-gray-300 mb-4">vs Florida Gators</p>
+                                <p class="text-xs text-yellow-400">Saturday 3:30 PM</p>
+                                <button class="btn-primary w-full mt-4 py-2 rounded-lg">Make Pick</button>
+                            </div>
+                            
+                            <div class="team-card glass-card rounded-xl p-6 text-center">
+                                <div class="w-16 h-16 bg-orange-600 rounded-full mx-auto mb-4 flex items-center justify-center text-green-400 font-bold text-lg">M</div>
+                                <h3 class="font-bold text-lg mb-2">Miami Hurricanes</h3>
+                                <p class="text-sm text-gray-300 mb-4">vs Virginia Tech</p>
+                                <p class="text-xs text-yellow-400">Saturday 8:00 PM</p>
+                                <button class="btn-primary w-full mt-4 py-2 rounded-lg">Make Pick</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Leaderboards Tab -->
+        <div id="leaderboards" class="tab-content hidden">
+            <div class="glass-card rounded-xl p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-2xl font-bold text-yellow-400">Leaderboards</h2>
+                    <div class="flex space-x-2">
+                        <button class="px-4 py-2 bg-yellow-400 text-black rounded-lg font-medium">Season</button>
+                        <button class="px-4 py-2 bg-gray-700 text-white rounded-lg">Weekly</button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="lg:col-span-2">
+                        <div class="space-y-4" id="leaderboardList">
+                            <!-- Leaderboard entries will be populated by JavaScript -->
+                        </div>
+                    </div>
+
+                    <div class="space-y-6">
+                        <!-- Statistics Chart -->
+                        <div class="glass-card rounded-xl p-6">
+                            <h3 class="text-lg font-bold text-yellow-400 mb-4">Performance Chart</h3>
+                            <canvas id="performanceChart" style="height: 200px;"></canvas>
+                        </div>
+
+                        <!-- Your Stats -->
+                        <div class="glass-card rounded-xl p-6">
+                            <h3 class="text-lg font-bold text-yellow-400 mb-4">Your Statistics</h3>
+                            <div class="space-y-3">
+                                <div class="flex justify-between">
+                                    <span>Current Rank:</span>
+                                    <span id="userRank" class="text-yellow-400 font-bold">--</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>Total Points:</span>
+                                    <span id="userPoints" class="text-yellow-400 font-bold">0</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>Accuracy:</span>
+                                    <span id="userAccuracy" class="text-yellow-400 font-bold">0%</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>Smoove Coins:</span>
+                                    <span id="userCoins" class="text-yellow-400 font-bold">0</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile Tab -->
+        <div id="profile" class="tab-content hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Profile Settings -->
+                <div class="lg:col-span-2 space-y-6">
+                    <div class="glass-card rounded-xl p-6">
+                        <h2 class="text-2xl font-bold text-yellow-400 mb-6">Profile Settings</h2>
+                        
+                        <div class="space-y-6">
+                            <!-- Avatar Selection -->
+                            <div>
+                                <label class="block text-sm font-medium mb-3">Profile Avatar</label>
+                                <div class="avatar-grid mb-4">
+                                    <div class="avatar-option bg-blue-500 flex items-center justify-center text-white font-bold" data-avatar="1">A</div>
+                                    <div class="avatar-option bg-green-500 flex items-center justify-center text-white font-bold" data-avatar="2">B</div>
+                                    <div class="avatar-option bg-purple-500 flex items-center justify-center text-white font-bold" data-avatar="3">C</div>
+                                    <div class="avatar-option bg-red-500 flex items-center justify-center text-white font-bold" data-avatar="4">D</div>
+                                    <div class="avatar-option bg-yellow-500 flex items-center justify-center text-black font-bold" data-avatar="5">E</div>
+                                    <div class="avatar-option bg-indigo-500 flex items-center justify-center text-white font-bold" data-avatar="6">F</div>
+                                </div>
+                            </div>
+
+                            <!-- Display Name -->
+                            <div>
+                                <label class="block text-sm font-medium mb-2">Display Name</label>
+                                <input type="text" id="profileDisplayName" class="w-full px-4 py-2 rounded-lg bg-gray-800 border border-gray-600 focus:border-yellow-400 focus:outline-none" placeholder="Enter display name">
+                            </div>
+
+                            <!-- Email (readonly) -->
+                            <div>
+                                <label class="block text-sm font-medium mb-2">Email</label>
+                                <input type="email" id="profileEmail" readonly class="w-full px-4 py-2 rounded-lg bg-gray-700 border border-gray-600 text-gray-400" placeholder="Not logged in">
+                            </div>
+
+                            <!-- Timezone -->
+                            <div>
+                                <label class="block text-sm font-medium mb-2">Timezone</label>
+                                <select id="profileTimezone" class="dropdown-dark w-full px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400">
+                                    <option value="EST">Eastern Time (ET)</option>
+                                    <option value="CST">Central Time (CT)</option>
+                                    <option value="MST">Mountain Time (MT)</option>
+                                    <option value="PST">Pacific Time (PT)</option>
+                                </select>
+                            </div>
+
+                            <button id="saveProfileBtn" class="btn-primary px-6 py-3 rounded-lg">
+                                <i class="fas fa-save mr-2"></i>Save Profile
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Change Password -->
+                    <div class="glass-card rounded-xl p-6">
+                        <h3 class="text-xl font-bold text-yellow-400 mb-4">Change Password</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium mb-2">Current Password</label>
+                                <input type="password" id="currentPassword" class="w-full px-4 py-2 rounded-lg bg-gray-800 border border-gray-600 focus:border-yellow-400 focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-2">New Password</label>
+                                <input type="password" id="newPassword" class="w-full px-4 py-2 rounded-lg bg-gray-800 border border-gray-600 focus:border-yellow-400 focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-2">Confirm New Password</label>
+                                <input type="password" id="confirmNewPassword" class="w-full px-4 py-2 rounded-lg bg-gray-800 border border-gray-600 focus:border-yellow-400 focus:outline-none">
+                            </div>
+                            <button id="changePasswordBtn" class="btn-primary px-6 py-3 rounded-lg">
+                                <i class="fas fa-key mr-2"></i>Change Password
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sidebar -->
+                <div class="space-y-6">
+                    <!-- Membership Status -->
+                    <div class="glass-card rounded-xl p-6">
+                        <h3 class="text-xl font-bold text-yellow-400 mb-4">Membership</h3>
+                        <div id="membershipStatus">
+                            <div class="text-center py-4">
+                                <div class="w-16 h-16 bg-gray-600 rounded-full mx-auto mb-4 flex items-center justify-center">
+                                    <i class="fas fa-user text-2xl"></i>
+                                </div>
+                                <p class="font-bold text-lg">Free Insider</p>
+                                <p class="text-sm text-gray-400 mb-4">Basic features included</p>
+                                <button id="upgradeBtn" class="btn-primary px-6 py-2 rounded-lg">
+                                    <i class="fas fa-crown mr-2"></i>Upgrade to Lounge Pass
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Smoove Coins -->
+                    <div class="glass-card rounded-xl p-6">
+                        <h3 class="text-xl font-bold text-yellow-400 mb-4">Smoove Coins</h3>
+                        <div class="text-center">
+                            <div class="text-4xl font-bold text-yellow-400 mb-2" id="profileCoins">0</div>
+                            <p class="text-sm text-gray-400 mb-4">Current balance</p>
+                            <button class="text-yellow-400 hover:underline text-sm">
+                                <i class="fas fa-history mr-1"></i>View Transaction History
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Quick Links -->
+                    <div class="glass-card rounded-xl p-6">
+                        <h3 class="text-xl font-bold text-yellow-400 mb-4">Account</h3>
+                        <div class="space-y-3">
+                            <button class="w-full text-left px-4 py-3 rounded-lg hover:bg-white hover:bg-opacity-10 flex items-center" onclick="showMembershipModal()">
+                                <i class="fas fa-crown mr-3 text-yellow-400"></i>
+                                <span>Membership Plans</span>
+                            </button>
+                            <button class="w-full text-left px-4 py-3 rounded-lg hover:bg-white hover:bg-opacity-10 flex items-center" onclick="showRulesModal()">
+                                <i class="fas fa-gavel mr-3 text-blue-400"></i>
+                                <span>Official Rules</span>
+                            </button>
+                            <button class="w-full text-left px-4 py-3 rounded-lg hover:bg-white hover:bg-opacity-10 flex items-center" onclick="showInvestorModal()">
+                                <i class="fas fa-chart-line mr-3 text-green-400"></i>
+                                <span>Investor Relations</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tester Feedback Tab -->
+        <div id="feedback" class="tab-content hidden">
+            <div class="glass-card rounded-xl p-6 max-w-4xl mx-auto">
+                <h2 class="text-2xl font-bold text-yellow-400 mb-6">Tester Feedback</h2>
+                <p class="text-gray-300 mb-6">Help us improve Tedo's Sports Lounge by sharing your feedback and suggestions!</p>
+
+                <form id="feedbackForm" class="space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Overall Experience</label>
+                            <select class="dropdown-dark w-full px-4 py-2 rounded-lg">
+                                <option>Excellent</option>
+                                <option>Good</option>
+                                <option>Fair</option>
+                                <option>Poor</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Feature Category</label>
+                            <select class="dropdown-dark w-full px-4 py-2 rounded-lg">
+                                <option>NFL Picks</option>
+                                <option>NCAA Picks</option>
+                                <option>Leaderboards</option>
+                                <option>User Interface</option>
+                                <option>Mobile App</option>
+                                <option>Smoove Coins</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Detailed Feedback</label>
+                        <textarea rows="6" class="w-full px-4 py-2 rounded-lg bg-gray-800 border border-gray-600 focus:border-yellow-400 focus:outline-none" placeholder="Please share your thoughts, suggestions, or report any issues..."></textarea>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="mr-2 text-yellow-400">
+                                <span class="text-sm">Bug Report</span>
+                            </label>
+                        </div>
+                        <div>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="mr-2">
+                                <span class="text-sm">Feature Request</span>
+                            </label>
+                        </div>
+                        <div>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="mr-2">
+                                <span class="text-sm">UI/UX Feedback</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-center">
+                        <button type="submit" class="btn-primary px-8 py-3 rounded-lg">
+                            <i class="fas fa-paper-plane mr-2"></i>Submit Feedback
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <!-- Membership Modal -->
+    <div id="membershipModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+        <div class="glass-card rounded-xl p-6 w-full max-w-4xl max-h-screen overflow-y-auto">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-yellow-400">Unlock Your Full Potential</h2>
+                <button onclick="closeMembershipModal()">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+
+            <p class="text-gray-300 mb-8 text-center">Choose the plan that's right for you. The Lounge Pass gives you full access to all premium features, now and in the future.</p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Free Insider -->
+                <div class="glass-card rounded-xl p-6">
+                    <h3 class="text-xl font-bold mb-2">Free Insider</h3>
+                    <p class="text-gray-400 mb-4">The essentials to get in the game.</p>
+                    <div class="text-3xl font-bold mb-6">Free</div>
+                    
+                    <div class="space-y-3 mb-6">
+                        <div class="flex items-center">
+                            <i class="fas fa-check text-green-400 mr-3"></i>
+                            <span>Full NFL Picks & Leaderboards</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-check text-green-400 mr-3"></i>
+                            <span>AI Live Score Updates</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-check text-green-400 mr-3"></i>
+                            <span>Standard Smoove Coin Earning</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-times text-red-400 mr-3"></i>
+                            <span>NCAA Picks & Leaderboards</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-times text-red-400 mr-3"></i>
+                            <span>Create & Join Private Leagues</span>
+                        </div>
+                    </div>
+                    
+                    <button class="w-full py-3 bg-gray-600 text-white rounded-lg">Your Current Plan</button>
+                </div>
+
+                <!-- Lounge Pass -->
+                <div class="glass-card rounded-xl p-6 border-2 border-yellow-400 relative">
+                    <div class="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                        <span class="bg-yellow-400 text-black px-4 py-1 rounded-full text-sm font-bold">BEST VALUE</span>
+                    </div>
+                    
+                    <h3 class="text-xl font-bold mb-2">Lounge Pass</h3>
+                    <p class="text-gray-400 mb-4">The ultimate experience for the true fan.</p>
+                    <div class="text-3xl font-bold text-yellow-400 mb-2">$7.99<span class="text-sm font-normal text-gray-400">/month</span></div>
+                    <div class="text-sm text-gray-400 mb-6">or $79.99 per year (2 months free)</div>
+                    
+                    <div class="space-y-3 mb-6">
+                        <div class="flex items-center">
+                            <i class="fas fa-check text-green-400 mr-3"></i>
+                            <span>Full NFL Picks & Leaderboards</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-check text-green-400 mr-3"></i>
+                            <span>AI Live Score Updates</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-check text-green-400 mr-3"></i>
+                            <span>1.5x Smoove Coin Bonus</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-check text-green-400 mr-3"></i>
+                            <span>Full NCAA Picks & Leaderboards</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-check text-green-400 mr-3"></i>
+                            <span>Create & Join Private Leagues</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-check text-green-400 mr-3"></i>
+                            <span>100% Ad-Free Experience</span>
+                        </div>
+                    </div>
+                    
+                    <button class="btn-primary w-full py-3 rounded-lg">
+                        Upgrade Now (Test)
+                    </button>
+                    <p class="text-xs text-gray-400 text-center mt-2">A link to a real payment page will be added after testing.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rules Modal -->
+    <div id="rulesModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+        <div class="glass-card rounded-xl p-6 w-full max-w-3xl max-h-screen overflow-y-auto">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-yellow-400">Official Rules</h2>
+                <button onclick="closeRulesModal()">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+
+            <div class="space-y-6 text-gray-300">
+                <div>
+                    <h3 class="text-lg font-bold text-yellow-400 mb-3">1. Eligibility</h3>
+                    <p>The contest is open to legal residents of their respective countries, states, or provinces where such contests are allowed. Participants must be 18 years of age or older. Employees of Tedo's Sports Lounge are not eligible.</p>
+                </div>
+
+                <div>
+                    <h3 class="text-lg font-bold text-yellow-400 mb-3">2. How to Play</h3>
+                    <p>Each week, a set of NFL and NCAAF games will be available for picks. Users must select the team they believe will win against the spread for each game. All picks must be submitted before the official start time of each game.</p>
+                </div>
+
+                <div>
+                    <h3 class="text-lg font-bold text-yellow-400 mb-3">3. Scoring</h3>
+                    <p>For each correct pick, the user will be awarded 10 points. Incorrect picks result in 0 points. A 'push' (tie against the spread) results in 5 points. The leaderboard is updated in real-time as games conclude.</p>
+                </div>
+
+                <div>
+                    <h3 class="text-lg font-bold text-yellow-400 mb-3">4. Smoove Coins</h3>
+                    <p>Users earn 5 Smoove Coins for each correct pick, with bonus coins available for perfect weeks and daily login rewards. Premium members receive a 1.5x multiplier on all coin earnings.</p>
+                </div>
+
+                <div>
+                    <h3 class="text-lg font-bold text-yellow-400 mb-3">5. Fair Play</h3>
+                    <p>Any attempt to manipulate the system, create multiple accounts, or engage in fraudulent activity will result in immediate disqualification and account suspension.</p>
+                </div>
+            </div>
+
+            <div class="flex justify-center mt-8">
+                <button class="btn-primary px-6 py-3 rounded-lg" onclick="window.open('data:text/plain;charset=utf-8,Official Rules - Tedo\\'s Sports Lounge\\n\\n1. Eligibility\\nThe contest is open to legal residents...', '_blank')">
+                    <i class="fas fa-download mr-2"></i>Download Full Rules (PDF)
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Investor Modal -->
+    <div id="investorModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+        <div class="glass-card rounded-xl p-6 w-full max-w-4xl max-h-screen overflow-y-auto">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-yellow-400">Investor Relations</h2>
+                <button onclick="closeInvestorModal()">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <h3 class="text-lg font-bold text-yellow-400 mb-4">Company Documents</h3>
+                    <div class="space-y-3">
+                        <button class="w-full text-left p-4 glass-card rounded-lg hover:bg-white hover:bg-opacity-10 flex items-center justify-between" onclick="openDocument('investor-packet')">
+                            <div class="flex items-center">
+                                <i class="fas fa-file-pdf text-red-400 mr-3"></i>
+                                <div>
+                                    <p class="font-medium">Investor Packet Q3 2024</p>
+                                    <p class="text-sm text-gray-400">Executive summary and financials</p>
+                                </div>
+                            </div>
+                            <i class="fas fa-external-link-alt"></i>
+                        </button>
+
+                        <button class="w-full text-left p-4 glass-card rounded-lg hover:bg-white hover:bg-opacity-10 flex items-center justify-between" onclick="openDocument('whitepaper')">
+                            <div class="flex items-center">
+                                <i class="fas fa-file-pdf text-red-400 mr-3"></i>
+                                <div>
+                                    <p class="font-medium">Smoove Coins Whitepaper</p>
+                                    <p class="text-sm text-gray-400">Virtual currency overview</p>
+                                </div>
+                            </div>
+                            <i class="fas fa-external-link-alt"></i>
+                        </button>
+
+                        <button class="w-full text-left p-4 glass-card rounded-lg hover:bg-white hover:bg-opacity-10 flex items-center justify-between" onclick="openDocument('rules')">
+                            <div class="flex items-center">
+                                <i class="fas fa-file-pdf text-red-400 mr-3"></i>
+                                <div>
+                                    <p class="font-medium">Official Rules 2024</p>
+                                    <p class="text-sm text-gray-400">Contest terms and conditions</p>
+                                </div>
+                            </div>
+                            <i class="fas fa-external-link-alt"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="text-lg font-bold text-yellow-400 mb-4">Market Opportunity</h3>
+                    <div class="space-y-4 text-gray-300">
+                        <p>The sports betting and fantasy sports market is experiencing exponential growth. Our platform carves a unique niche by focusing on a user-friendly, community-driven experience.</p>
+                        
+                        <div class="glass-card rounded-lg p-4">
+                            <h4 class="font-bold text-yellow-400 mb-2">Key Metrics</h4>
+                            <div class="space-y-2 text-sm">
+                                <div class="flex justify-between">
+                                    <span>Target Market Size:</span>
+                                    <span class="text-yellow-400">$7.2B</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>Projected Growth Rate:</span>
+                                    <span class="text-yellow-400">15% YoY</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>User Acquisition Cost:</span>
+                                    <span class="text-yellow-400">$12</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <p class="text-sm">For detailed financial projections and business model analysis, please download our investor packet.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center mt-8">
+                <p class="text-sm text-gray-400 mb-4">For investor inquiries, please contact:</p>
+                <a href="/cdn-cgi/l/email-protection#b2c1dddcdecbd1dddcc1c7dec6dbdcd5f2d5dfd3dbde9cd1dddf" class="text-yellow-400 hover:underline font-medium">
+                    <span class="__cf_email__" data-cfemail="3b4854555742585455484e574f52555c7b5c565a525715585456">[email&#160;protected]</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+        // Application State
+        let currentUser = null;
+        let currentWeek = 1;
+        let userPicks = {};
+        let leaderboardData = [];
+        let isPremium = false;
+
+        // NFL Schedule Data
+        const nflSchedule = {
+            1: [
+                { id: 1, home: 'Philadelphia Eagles', away: 'Dallas Cowboys', time: '2025-09-04 20:20:00', homeUrl: 'https://www.philadelphiaeagles.com', awayUrl: 'https://www.dallascowboys.com' },
+                { id: 2, home: 'Los Angeles Chargers', away: 'Kansas City Chiefs', time: '2025-09-05 20:00:00', homeUrl: 'https://www.chargers.com', awayUrl: 'https://www.chiefs.com' },
+                { id: 3, home: 'New England Patriots', away: 'Las Vegas Raiders', time: '2025-09-07 13:00:00', homeUrl: 'https://www.patriots.com', awayUrl: 'https://www.raiders.com' },
+                { id: 4, home: 'New York Jets', away: 'Pittsburgh Steelers', time: '2025-09-07 13:00:00', homeUrl: 'https://www.newyorkjets.com', awayUrl: 'https://www.steelers.com' },
+                { id: 5, home: 'Indianapolis Colts', away: 'Miami Dolphins', time: '2025-09-07 13:00:00', homeUrl: 'https://www.colts.com', awayUrl: 'https://www.miamidolphins.com' },
+                { id: 6, home: 'New Orleans Saints', away: 'Arizona Cardinals', time: '2025-09-07 13:00:00', homeUrl: 'https://www.neworleanssaints.com', awayUrl: 'https://www.azcardinals.com' },
+                { id: 7, home: 'Washington Commanders', away: 'New York Giants', time: '2025-09-07 13:00:00', homeUrl: 'https://www.commanders.com', awayUrl: 'https://www.giants.com' },
+                { id: 8, home: 'Jacksonville Jaguars', away: 'Carolina Panthers', time: '2025-09-07 13:00:00', homeUrl: 'https://www.jaguars.com', awayUrl: 'https://www.panthers.com' }
+            ],
+            2: [
+                { id: 9, home: 'Green Bay Packers', away: 'Washington Commanders', time: '2025-09-11 20:15:00', homeUrl: 'https://www.packers.com', awayUrl: 'https://www.commanders.com' },
+                { id: 10, home: 'Cincinnati Bengals', away: 'Jacksonville Jaguars', time: '2025-09-14 13:00:00', homeUrl: 'https://www.bengals.com', awayUrl: 'https://www.jaguars.com' },
+                { id: 11, home: 'New York Jets', away: 'Buffalo Bills', time: '2025-09-14 13:00:00', homeUrl: 'https://www.newyorkjets.com', awayUrl: 'https://www.buffalobills.com' },
+                { id: 12, home: 'Miami Dolphins', away: 'New England Patriots', time: '2025-09-14 13:00:00', homeUrl: 'https://www.miamidolphins.com', awayUrl: 'https://www.patriots.com' }
+            ]
+        };
+
+        // Sample leaderboard data
+        const sampleLeaderboard = [
+            { rank: 1, name: 'GridironGuru', avatar: '1', points: 85, accuracy: 85, coins: 125 },
+            { rank: 2, name: 'TedoMaster', avatar: '2', points: 75, accuracy: 75, coins: 110 },
+            { rank: 3, name: 'SmooveSpots', avatar: '3', points: 70, accuracy: 70, coins: 95 },
+            { rank: 4, name: 'ds06030', avatar: '4', points: 65, accuracy: 65, coins: 85 },
+            { rank: 5, name: 'TouchdownTim', avatar: '5', points: 60, accuracy: 60, coins: 75 }
+        ];
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeApp();
+            setupEventListeners();
+            loadUserData();
+            renderNFLGames();
+            renderLeaderboard();
+            setupPerformanceChart();
+        });
+
+        function initializeApp() {
+            // Set initial tab
+            showTab('lounge');
+            
+            // Load saved user session
+            const savedUser = localStorage.getItem('currentUser');
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser);
+                updateUserInterface();
+            }
+
+            // Load user picks
+            const savedPicks = localStorage.getItem('userPicks');
+            if (savedPicks) {
+                userPicks = JSON.parse(savedPicks);
+            }
+
+            // Check for premium status
+            isPremium = localStorage.getItem('isPremium') === 'true';
+            updatePremiumFeatures();
+        }
+
+        function setupEventListeners() {
+            // Navigation
+            document.querySelectorAll('.nav-tab, .mobile-tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const tabName = this.getAttribute('data-tab');
+                    showTab(tabName);
+                    closeMobileMenu();
+                });
+            });
+
+            // Mobile menu
+            document.getElementById('mobileMenuBtn').addEventListener('click', openMobileMenu);
+            document.getElementById('closeMobileMenu').addEventListener('click', closeMobileMenu);
+
+            // Authentication
+            document.getElementById('authBtn').addEventListener('click', function() {
+                if (currentUser) {
+                    logout();
+                } else {
+                    showAuthModal();
+                }
+            });
+
+            document.getElementById('closeAuthModal').addEventListener('click', hideAuthModal);
+            document.getElementById('toggleAuth').addEventListener('click', toggleAuthMode);
+            document.getElementById('authForm').addEventListener('submit', handleAuth);
+
+            // Profile
+            document.getElementById('saveProfileBtn').addEventListener('click', saveProfile);
+            document.getElementById('changePasswordBtn').addEventListener('click', changePassword);
+            
+            // Avatar selection
+            document.querySelectorAll('.avatar-option').forEach(avatar => {
+                avatar.addEventListener('click', function() {
+                    document.querySelectorAll('.avatar-option').forEach(a => a.classList.remove('selected'));
+                    this.classList.add('selected');
+                });
+            });
+
+            // Week selector
+            document.getElementById('weekSelector').addEventListener('change', function() {
+                currentWeek = parseInt(this.value);
+                renderNFLGames();
+            });
+
+            // Save picks
+            document.getElementById('savePicksBtn').addEventListener('click', savePicks);
+
+            // Feedback form
+            document.getElementById('feedbackForm').addEventListener('submit', handleFeedback);
+
+            // PWA install
+            setupPWA();
+        }
+
+        function showTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.add('hidden');
+            });
+
+            // Show selected tab
+            document.getElementById(tabName).classList.remove('hidden');
+
+            // Update navigation
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+
+            // Special handling for certain tabs
+            if (tabName === 'leaderboards') {
+                renderLeaderboard();
+                updatePerformanceChart();
+            } else if (tabName === 'profile') {
+                loadProfileData();
+            }
+        }
+
+        function openMobileMenu() {
+            document.getElementById('mobileMenu').classList.add('open');
+        }
+
+        function closeMobileMenu() {
+            document.getElementById('mobileMenu').classList.remove('open');
+        }
+
+        function showAuthModal() {
+            document.getElementById('authModal').classList.remove('hidden');
+        }
+
+        function hideAuthModal() {
+            document.getElementById('authModal').classList.add('hidden');
+        }
+
+        function toggleAuthMode() {
+            const isSignup = document.getElementById('signupFields').classList.contains('hidden');
+            
+            if (isSignup) {
+                // Switch to signup
+                document.getElementById('authTitle').textContent = 'Sign Up';
+                document.getElementById('authSubmitText').textContent = 'Sign Up';
+                document.getElementById('toggleAuthText').textContent = 'Already have an account? Login';
+                document.getElementById('signupFields').classList.remove('hidden');
+            } else {
+                // Switch to login
+                document.getElementById('authTitle').textContent = 'Login';
+                document.getElementById('authSubmitText').textContent = 'Login';
+                document.getElementById('toggleAuthText').textContent = "Don't have an account? Sign up";
+                document.getElementById('signupFields').classList.add('hidden');
+            }
+        }
+
+        function handleAuth(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('authEmail').value;
+            const password = document.getElementById('authPassword').value;
+            const isSignup = !document.getElementById('signupFields').classList.contains('hidden');
+
+            if (isSignup) {
+                const confirmPassword = document.getElementById('confirmPassword').value;
+                const displayName = document.getElementById('displayName').value;
+
+                if (password !== confirmPassword) {
+                    alert('Passwords do not match!');
+                    return;
+                }
+
+                // Create new user
+                const newUser = {
+                    email: email,
+                    displayName: displayName || email.split('@')[0],
+                    avatar: '1',
+                    coins: 50, // Welcome bonus
+                    joinDate: new Date().toISOString(),
+                    timezone: 'EST'
+                };
+
+                // Save user data
+                localStorage.setItem(`user_${email}`, JSON.stringify(newUser));
+                localStorage.setItem(`password_${email}`, password);
+                
+                currentUser = newUser;
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                
+                alert('Account created successfully! Welcome bonus: 50 Smoove Coins!');
+            } else {
+                // Login existing user
+                const savedUser = localStorage.getItem(`user_${email}`);
+                const savedPassword = localStorage.getItem(`password_${email}`);
+
+                if (!savedUser || savedPassword !== password) {
+                    alert('Invalid email or password!');
+                    return;
+                }
+
+                currentUser = JSON.parse(savedUser);
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            }
+
+            updateUserInterface();
+            hideAuthModal();
+            
+            // Clear form
+            document.getElementById('authForm').reset();
+        }
+
+        function logout() {
+            currentUser = null;
+            localStorage.removeItem('currentUser');
+            updateUserInterface();
+            showTab('lounge');
+        }
+
+        function updateUserInterface() {
+            const authBtn = document.getElementById('authBtn');
+            const userGreeting = document.getElementById('userGreeting');
+            const coinBalance = document.getElementById('coinBalance');
+
+            if (currentUser) {
+                authBtn.textContent = 'Logout';
+                userGreeting.textContent = `Welcome, ${currentUser.displayName}!`;
+                coinBalance.textContent = currentUser.coins || 0;
+                
+                // Update profile coins display
+                document.getElementById('profileCoins').textContent = currentUser.coins || 0;
+            } else {
+                authBtn.textContent = 'Login';
+                userGreeting.textContent = 'Welcome!';
+                coinBalance.textContent = '0';
+                document.getElementById('profileCoins').textContent = '0';
+            }
+        }
+
+        function renderNFLGames() {
+            const gamesContainer = document.getElementById('nflGames');
+            const games = nflSchedule[currentWeek] || [];
+
+            if (games.length === 0) {
+                gamesContainer.innerHTML = '<div class="col-span-full text-center text-gray-400">No games scheduled for this week.</div>';
+                return;
+            }
+
+            gamesContainer.innerHTML = games.map(game => `
+                <div class="glass-card rounded-xl p-4 team-card" data-game-id="${game.id}">
+                    <div class="text-center mb-4">
+                        <div class="text-xs text-yellow-400 mb-2">${formatGameTime(game.time)}</div>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="team-option text-center p-3 rounded-lg cursor-pointer hover:bg-white hover:bg-opacity-10 ${userPicks[game.id] === 'away' ? 'bg-yellow-400 bg-opacity-20 border border-yellow-400' : ''}" 
+                             onclick="selectTeam(${game.id}, 'away', '${game.away}', '${game.awayUrl}')">
+                            <div class="w-12 h-12 bg-blue-600 rounded-full mx-auto mb-2 flex items-center justify-center text-white font-bold text-xs">
+                                ${getTeamAbbr(game.away)}
+                            </div>
+                            <div class="text-sm font-medium">${game.away}</div>
+                            <div class="text-xs text-gray-400 mt-1">@ ${getTeamAbbr(game.home)}</div>
+                        </div>
+                        
+                        <div class="team-option text-center p-3 rounded-lg cursor-pointer hover:bg-white hover:bg-opacity-10 ${userPicks[game.id] === 'home' ? 'bg-yellow-400 bg-opacity-20 border border-yellow-400' : ''}" 
+                             onclick="selectTeam(${game.id}, 'home', '${game.home}', '${game.homeUrl}')">
+                            <div class="w-12 h-12 bg-red-600 rounded-full mx-auto mb-2 flex items-center justify-center text-white font-bold text-xs">
+                                ${getTeamAbbr(game.home)}
+                            </div>
+                            <div class="text-sm font-medium">${game.home}</div>
+                            <div class="text-xs text-gray-400 mt-1">vs ${getTeamAbbr(game.away)}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4 flex justify-between items-center">
+                        <button class="text-xs text-blue-400 hover:underline" onclick="window.open('${game.awayUrl}', '_blank')">
+                            <i class="fas fa-external-link-alt mr-1"></i>${getTeamAbbr(game.away)} Site
+                        </button>
+                        <button class="text-xs text-red-400 hover:underline" onclick="window.open('${game.homeUrl}', '_blank')">
+                            <i class="fas fa-external-link-alt mr-1"></i>${getTeamAbbr(game.home)} Site
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+
+            updateSaveButton();
+        }
+
+        function selectTeam(gameId, side, teamName, teamUrl) {
+            if (!currentUser) {
+                alert('Please login to make picks!');
+                showAuthModal();
+                return;
+            }
+
+            userPicks[gameId] = side;
+            localStorage.setItem('userPicks', JSON.stringify(userPicks));
+            renderNFLGames();
+        }
+
+        function getTeamAbbr(teamName) {
+            const abbrs = {
+                'Philadelphia Eagles': 'PHI',
+                'Dallas Cowboys': 'DAL',
+                'Los Angeles Chargers': 'LAC',
+                'Kansas City Chiefs': 'KC',
+                'New England Patriots': 'NE',
+                'Las Vegas Raiders': 'LV',
+                'New York Jets': 'NYJ',
+                'Pittsburgh Steelers': 'PIT',
+                'Indianapolis Colts': 'IND',
+                'Miami Dolphins': 'MIA',
+                'New Orleans Saints': 'NO',
+                'Arizona Cardinals': 'ARI',
+                'Washington Commanders': 'WAS',
+                'New York Giants': 'NYG',
+                'Jacksonville Jaguars': 'JAX',
+                'Carolina Panthers': 'CAR',
+                'Green Bay Packers': 'GB',
+                'Cincinnati Bengals': 'CIN',
+                'Buffalo Bills': 'BUF'
+            };
+            return abbrs[teamName] || teamName.substr(0, 3).toUpperCase();
+        }
+
+        function formatGameTime(timeString) {
+            const date = new Date(timeString);
+            const options = { 
+                weekday: 'short', 
+                month: 'short', 
+                day: 'numeric', 
+                hour: 'numeric', 
+                minute: '2-digit',
+                hour12: true 
+            };
+            return date.toLocaleDateString('en-US', options);
+        }
+
+        function updateSaveButton() {
+            const saveBtn = document.getElementById('savePicksBtn');
+            const hasPicksForWeek = Object.keys(userPicks).some(gameId => {
+                const game = nflSchedule[currentWeek]?.find(g => g.id.toString() === gameId);
+                return game !== undefined;
+            });
+
+            saveBtn.disabled = !hasPicksForWeek || !currentUser;
+        }
+
+        function savePicks() {
+            if (!currentUser) {
+                alert('Please login to save picks!');
+                return;
+            }
+
+            // Calculate coins earned (5 per pick for now)
+            const currentWeekGames = nflSchedule[currentWeek] || [];
+            const picksThisWeek = currentWeekGames.filter(game => userPicks[game.id]).length;
+            const coinsEarned = picksThisWeek * 2; // 2 coins per pick saved
+
+            currentUser.coins = (currentUser.coins || 0) + coinsEarned;
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            localStorage.setItem(`user_${currentUser.email}`, JSON.stringify(currentUser));
+
+            updateUserInterface();
+            
+            alert(`Picks saved successfully! You earned ${coinsEarned} Smoove Coins for making ${picksThisWeek} picks!`);
+        }
+
+        function renderLeaderboard() {
+            const leaderboardContainer = document.getElementById('leaderboardList');
+            
+            leaderboardContainer.innerHTML = sampleLeaderboard.map(user => `
+                <div class="leaderboard-position rounded-xl p-4 flex items-center justify-between">
+                    <div class="flex items-center space-x-4">
+                        <div class="flex items-center justify-center w-8 h-8 rounded-full font-bold ${getRankColor(user.rank)}">
+                            ${user.rank}
+                        </div>
+                        <div class="w-12 h-12 bg-${getAvatarColor(user.avatar)} rounded-full flex items-center justify-center text-white font-bold">
+                            ${user.name.charAt(0)}
+                        </div>
+                        <div>
+                            <div class="font-bold text-lg">${user.name}</div>
+                            <div class="text-sm text-gray-400">${user.accuracy}% accuracy</div>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-2xl font-bold text-yellow-400">${user.points}</div>
+                        <div class="text-sm text-gray-400">${user.coins} coins</div>
+                    </div>
+                </div>
+            `).join('');
+
+            // Update user stats
+            if (currentUser) {
+                const userStats = sampleLeaderboard.find(u => u.name === currentUser.displayName) || 
+                                { rank: '--', points: 0, accuracy: 0 };
+                
+                document.getElementById('userRank').textContent = userStats.rank;
+                document.getElementById('userPoints').textContent = userStats.points;
+                document.getElementById('userAccuracy').textContent = userStats.accuracy + '%';
+                document.getElementById('userCoins').textContent = currentUser.coins || 0;
+            }
+        }
+
+        function getRankColor(rank) {
+            if (rank === 1) return 'bg-yellow-400 text-black';
+            if (rank === 2) return 'bg-gray-400 text-black';
+            if (rank === 3) return 'bg-orange-400 text-black';
+            return 'bg-gray-600 text-white';
+        }
+
+        function getAvatarColor(avatar) {
+            const colors = ['blue-500', 'green-500', 'purple-500', 'red-500', 'yellow-500', 'indigo-500'];
+            return colors[parseInt(avatar) - 1] || 'blue-500';
+        }
+
+        function setupPerformanceChart() {
+            const ctx = document.getElementById('performanceChart').getContext('2d');
+            
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5'],
+                    datasets: [{
+                        label: 'Your Performance',
+                        data: [65, 70, 75, 85, 90],
+                        borderColor: '#FFD700',
+                        backgroundColor: 'rgba(255, 215, 0, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#ffffff'
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: {
+                                color: '#ffffff'
+                            },
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            }
+                        },
+                        y: {
+                            ticks: {
+                                color: '#ffffff'
+                            },
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updatePerformanceChart() {
+            // Chart update logic would go here
+        }
+
+        function loadProfileData() {
+            if (!currentUser) return;
+
+            document.getElementById('profileDisplayName').value = currentUser.displayName || '';
+            document.getElementById('profileEmail').value = currentUser.email || '';
+            document.getElementById('profileTimezone').value = currentUser.timezone || 'EST';
+            
+            // Select current avatar
+            if (currentUser.avatar) {
+                document.querySelectorAll('.avatar-option').forEach(avatar => {
+                    avatar.classList.remove('selected');
+                    if (avatar.getAttribute('data-avatar') === currentUser.avatar) {
+                        avatar.classList.add('selected');
+                    }
+                });
+            }
+        }
+
+        function saveProfile() {
+            if (!currentUser) {
+                alert('Please login first!');
+                return;
+            }
+
+            const displayName = document.getElementById('profileDisplayName').value;
+            const timezone = document.getElementById('profileTimezone').value;
+            const selectedAvatar = document.querySelector('.avatar-option.selected');
+
+            if (displayName.trim() === '') {
+                alert('Display name cannot be empty!');
+                return;
+            }
+
+            currentUser.displayName = displayName;
+            currentUser.timezone = timezone;
+            if (selectedAvatar) {
+                currentUser.avatar = selectedAvatar.getAttribute('data-avatar');
+            }
+
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            localStorage.setItem(`user_${currentUser.email}`, JSON.stringify(currentUser));
+
+            updateUserInterface();
+            alert('Profile saved successfully!');
+        }
+
+        function changePassword() {
+            if (!currentUser) {
+                alert('Please login first!');
+                return;
+            }
+
+            const currentPassword = document.getElementById('currentPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmNewPassword = document.getElementById('confirmNewPassword').value;
+
+            const savedPassword = localStorage.getItem(`password_${currentUser.email}`);
+
+            if (currentPassword !== savedPassword) {
+                alert('Current password is incorrect!');
+                return;
+            }
+
+            if (newPassword !== confirmNewPassword) {
+                alert('New passwords do not match!');
+                return;
+            }
+
+            if (newPassword.length < 6) {
+                alert('New password must be at least 6 characters!');
+                return;
+            }
+
+            localStorage.setItem(`password_${currentUser.email}`, newPassword);
+            
+            // Clear password fields
+            document.getElementById('currentPassword').value = '';
+            document.getElementById('newPassword').value = '';
+            document.getElementById('confirmNewPassword').value = '';
+
+            alert('Password changed successfully!');
+        }
+
+        function updatePremiumFeatures() {
+            const ncaaLocked = document.getElementById('ncaaLocked');
+            const ncaaUnlocked = document.getElementById('ncaaUnlocked');
+
+            if (isPremium) {
+                ncaaLocked.classList.add('hidden');
+                ncaaUnlocked.classList.remove('hidden');
+            } else {
+                ncaaLocked.classList.remove('hidden');
+                ncaaUnlocked.classList.add('hidden');
+            }
+        }
+
+        function handleFeedback(e) {
+            e.preventDefault();
+            alert('Thank you for your feedback! Your input helps us improve Tedo\'s Sports Lounge.');
+            document.getElementById('feedbackForm').reset();
+        }
+
+        // Modal functions
+        function showMembershipModal() {
+            document.getElementById('membershipModal').classList.remove('hidden');
+        }
+
+        function closeMembershipModal() {
+            document.getElementById('membershipModal').classList.add('hidden');
+        }
+
+        function showRulesModal() {
+            document.getElementById('rulesModal').classList.remove('hidden');
+        }
+
+        function closeRulesModal() {
+            document.getElementById('rulesModal').classList.add('hidden');
+        }
+
+        function showInvestorModal() {
+            document.getElementById('investorModal').classList.remove('hidden');
+        }
+
+        function closeInvestorModal() {
+            document.getElementById('investorModal').classList.add('hidden');
+        }
+
+        function openDocument(docType) {
+            const documents = {
+                'investor-packet': 'data:application/pdf;base64,JVBERi0xLjQKJcfsj6IKNSAwIG9iago8PAovTGVuZ3RoIDYgMCBSCi9GaWx0ZXIgL0ZsYXRlRGVjb2RlCj4+CnN0cmVhbQp4nE2NwQrCMBBE7/mKuTZJk6be9iIK9uBfqPc0m5cY2s0m2Qjy9249eHveZ2YY8yGaJqbQ3UEGPneCOChUwgv8ygM1l7k5H9DRHnGl83vJmR7HnKAWPJaUL9/3v+1kpxs4jO2Mh5H+bVPtw7LTn8R6vuwHSJYSqGKsrBbz+B7nJJEOxz3LmGXOfaNO6HiCXHlHVxFPVhTBxL0pKOyg8Av0kNGNagYZmS4gTQQkPyKRfQf25HQZKQo',
+                'whitepaper': 'data:application/pdf;base64,JVBERi0xLjQKJcfsj6IKNSAwIG9iago8PAovTGVuZ3RoIDYgMCBSCi9GaWx0ZXIgL0ZsYXRlRGVjb2RlCj4+CnN0cmVhbQp4nE2NwQrCMBBE7/mKuTZJk6be9iIK9uBfqPc0m5cY2s0m2Qjy9249eHveZ2YY8yGaJqbQ3UEGPneCOChUwgv8ygM1l7k5H9DRHnGl83vJmR7HnKAWPJaUL9/3v+1kpxs4jO2Mh5H+bVPtw7LTn8R6vuwHSJYSqGKsrBbz+B7nJJEOxz3LmGXOfaNO6HiCXHlHVxFPVhTBxL0pKOyg8Av0kNGNagYZmS4gTQQkPyKRfQf25HQZ',
+                'rules': 'data:application/pdf;base64,JVBERi0xLjQKJcfsj6IKNSAwIG9iago8PAovTGVuZ3RoIDYgMCBSCi9GaWx0ZXIgL0ZsYXRlRGVjb2RlCj4+CnN0cmVhbQp4nE2NwQrCMBBE7/mKuTZJk6be9iIK9uBfqPc0m5cY2s0m2Qjy9249eHveZ2YY8yGaJqbQ3UEGPneCOChUwgv8ygM1l7k5H9DRHnGl83vJmR7HnKAWPJaUL9/3v+1kpxs4jO2Mh5H+bVPtw7LTn8R6vuwHSJYSqGKsrBbz+B7nJJEOxz3LmGXOfaNO6HiCXHlHVxFPVhTBxL0pKOyg8Av0kNGNag'
+            };
+
+            const docData = documents[docType];
+            if (docData) {
+                const newWindow = window.open();
+                newWindow.document.write(`
+                    <html>
+                        <head><title>Tedo's Sports Lounge - Document</title></head>
+                        <body style="margin:0;padding:20px;font-family:Arial,sans-serif;background:#f5f5f5;">
+                            <h2 style="color:#2D5A5A;margin-bottom:20px;">Document Content</h2>
+                            <div style="background:white;padding:20px;border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,0.1);">
+                                <p>This is a sample document for demonstration purposes.</p>
+                                <p>In a production environment, this would contain the full document content.</p>
+                                <div style="margin-top:20px;padding:15px;background:#f0f8ff;border-left:4px solid #2D5A5A;">
+                                    <strong>Document Type:</strong> ${docType.replace('-', ' ').toUpperCase()}
+                                </div>
+                            </div>
+                        </body>
+                    </html>
+                `);
+            }
+        }
+
+        function loadUserData() {
+            // Load any additional user data
+        }
+
+        // PWA Setup
+        function setupPWA() {
+            let deferredPrompt;
+            const installBtn = document.getElementById('installBtn');
+            const pwaInstall = document.getElementById('pwaInstall');
+
+            window.addEventListener('beforeinstallprompt', (e) => {
+                e.preventDefault();
+                deferredPrompt = e;
+                pwaInstall.classList.remove('hidden');
+            });
+
+            installBtn.addEventListener('click', () => {
+                if (deferredPrompt) {
+                    deferredPrompt.prompt();
+                    deferredPrompt.userChoice.then((choiceResult) => {
+                        if (choiceResult.outcome === 'accepted') {
+                            pwaInstall.classList.add('hidden');
+                        }
+                        deferredPrompt = null;
+                    });
+                }
+            });
+
+            // Service Worker Registration
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('data:text/javascript;base64,c2VsZi5hZGRFdmVudExpc3RlbmVyKCdpbnN0YWxsJywgZnVuY3Rpb24oZXZlbnQpIHsKICBjb25zb2xlLmxvZygnU2VydmljZSBXb3JrZXIgaW5zdGFsbGVkJyk7Cn0pOwoKc2VsZi5hZGRFdmVudExpc3RlbmVyKCdmZXRjaCcsIGZ1bmN0aW9uKGV2ZW50KSB7CiAgY29uc29sZS5sb2coJ1NlcnZpY2UgV29ya2VyIGZldGNoJyk7Cn0pOw==')
+                .then(() => console.log('Service Worker registered'))
+                .catch(() => console.log('Service Worker registration failed'));
+            }
+        }
+
+        // Share functionality
+        function shareProfile() {
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Check out my Tedo\'s Sports Lounge profile!',
+                    text: 'Join me on Tedo\'s Sports Lounge for NFL and NCAA picks!',
+                    url: window.location.href
+                });
+            } else {
+                // Fallback - copy to clipboard
+                navigator.clipboard.writeText(window.location.href);
+                alert('Profile link copied to clipboard!');
+            }
+        }
+
+        // Close modals on outside click
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('fixed') && e.target.classList.contains('inset-0')) {
+                e.target.classList.add('hidden');
+            }
+        });
+    </script>
+
+    <!-- PWA Manifest -->
+    <script>
+        const manifest = {
+            name: "Tedo's Football Lounge",
+            short_name: "TSL",
+            description: "Fantasy football picks and leaderboards",
+            start_url: "/",
+            display: "standalone",
+            background_color: "#2D5A5A",
+            theme_color: "#FFD700",
+            icons: [
+                {
+                    src: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==",
+                    sizes: "192x192",
+                    type: "image/png"
+                }
+            ]
+        };
+        
+        const manifestBlob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
+        const manifestURL = URL.createObjectURL(manifestBlob);
+        
+        const link = document.createElement('link');
+        link.rel = 'manifest';
+        link.href = manifestURL;
+        document.head.appendChild(link);
+    </script>
+</body>
+</html>
+    <script id="html_badge_script1">
+        window.__genspark_remove_badge_link = "https://www.genspark.ai/api/html_badge/" +
+            "remove_badge?token=To%2FBnjzloZ3UfQdcSaYfDtlHQuXqeOdJbY%2BtfZm%2B%2FK8Otjc6PmNdPmcbEl0oEx7JugBfVDcZwJixJr5gNi2kL4KjUZcs4uKKNMrE%2B9oNH9GWkYKkDEjExwNZgDaoDQe9DAFnaiDqNFUmrNgmWM0takmHlyQmD5ydOh26vLdnMO4%2FQh1DrurfFLQn%2FnNp6LqtIxfiAPd%2B%2F4GH%2Fg9sE%2BKd7xGG3AdxG1CCSGmaxQbKBPqi6dvDi9G1mhcEGbLhD9sMxBl4%2BNDek2F3fVEEVAXYBurl7Gjl2BHX%2F73orzvAir%2FqyG4AyHnpFNFKWjTXRZ2H8ukb%2Btd9rzJsevqunzlT4JSjhc%2BmG2DVnxux68M55jYDldMhNGHsg9%2FZlp1oQQ842KklS3fkuNE1dmgh1%2FQPiM6QxmL1fadcKDjt472SrotqCLENxsLzKfrym4om3AJYNTPO4t5jc5PHgK9XQ7au9bLIprLQGXHIV%2B5qm9VJ8t4LwUNSatBD235OJ2pGAYqaUe4EevKqhZI8txxkgchx6A%3D%3D";
+        window.__genspark_locale = "en-US";
+        window.__genspark_token = "To/BnjzloZ3UfQdcSaYfDtlHQuXqeOdJbY+tfZm+/K8Otjc6PmNdPmcbEl0oEx7JugBfVDcZwJixJr5gNi2kL4KjUZcs4uKKNMrE+9oNH9GWkYKkDEjExwNZgDaoDQe9DAFnaiDqNFUmrNgmWM0takmHlyQmD5ydOh26vLdnMO4/Qh1DrurfFLQn/nNp6LqtIxfiAPd+/4GH/g9sE+Kd7xGG3AdxG1CCSGmaxQbKBPqi6dvDi9G1mhcEGbLhD9sMxBl4+NDek2F3fVEEVAXYBurl7Gjl2BHX/73orzvAir/qyG4AyHnpFNFKWjTXRZ2H8ukb+td9rzJsevqunzlT4JSjhc+mG2DVnxux68M55jYDldMhNGHsg9/Zlp1oQQ842KklS3fkuNE1dmgh1/QPiM6QxmL1fadcKDjt472SrotqCLENxsLzKfrym4om3AJYNTPO4t5jc5PHgK9XQ7au9bLIprLQGXHIV+5qm9VJ8t4LwUNSatBD235OJ2pGAYqaUe4EevKqhZI8txxkgchx6A==";
+    </script>
+    
+    <script id="html_notice_dialog_script" src="https://www.genspark.ai/notice_dialog.js"></script>
+    
