@@ -1,0 +1,1492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tedo's Football Lounge - Smoove Spots Fantasy Platform</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #2D5A5A;
+            --accent-color: #FFD700;
+            --dark-bg: #1a365d;
+            --text-light: #ffffff;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--dark-bg) 100%);
+            color: var(--text-light);
+            font-family: 'Arial', sans-serif;
+            min-height: 100vh;
+        }
+        
+        .accent-bg { background-color: var(--accent-color); color: #000; }
+        .primary-bg { background-color: var(--primary-color); }
+        .dark-bg { background-color: var(--dark-bg); }
+        
+        .tab-button.active {
+            background-color: var(--accent-color);
+            color: #000;
+        }
+        
+        .game-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .team-option {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .team-option:hover {
+            background-color: rgba(255, 215, 0, 0.2);
+            transform: scale(1.02);
+        }
+        
+        .team-option.selected {
+            background-color: var(--accent-color);
+            color: #000;
+        }
+        
+        .dropdown-content {
+            background-color: var(--dark-bg);
+            border: 1px solid var(--accent-color);
+        }
+        
+        .admin-badge {
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            color: #000;
+            font-weight: bold;
+        }
+        
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        .avatar-preview {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--accent-color);
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 15px 20px;
+            border-radius: 8px;
+            color: white;
+            font-weight: bold;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification.success { background-color: #10B981; }
+        .notification.error { background-color: #EF4444; }
+        .notification.info { background-color: #3B82F6; }
+        
+        @media (max-width: 768px) {
+            .tab-button {
+                font-size: 0.8rem;
+                padding: 0.5rem;
+            }
+            
+            .game-card {
+                margin: 0.5rem 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Notification System -->
+    <div id="notification" class="notification"></div>
+
+    <!-- Header -->
+    <header class="primary-bg shadow-lg">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-4">
+                    <div class="accent-bg text-black px-3 py-2 rounded-lg font-bold text-xl">TSL</div>
+                    <div>
+                        <h1 class="text-2xl font-bold">Tedo's Sports Lounge</h1>
+                        <p class="text-sm opacity-75">Smoove Spots NFL & NCAA Football</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div id="userInfo" class="hidden items-center space-x-3">
+                        <img id="userAvatar" class="avatar-preview" src="" alt="Avatar">
+                        <div>
+                            <div id="userDisplayName" class="font-semibold"></div>
+                            <div id="userCoins" class="text-sm accent-bg text-black px-2 py-1 rounded">0 Coins</div>
+                        </div>
+                    </div>
+                    <button id="authButton" class="accent-bg text-black px-4 py-2 rounded-lg font-semibold hover:opacity-90">
+                        Login
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="dark-bg border-b border-gray-600">
+        <div class="container mx-auto px-4">
+            <div class="flex space-x-1 overflow-x-auto">
+                <button class="tab-button px-4 py-3 rounded-t-lg whitespace-nowrap active" data-tab="lounge">
+                    <i class="fas fa-home mr-2"></i>Lounge
+                </button>
+                <button class="tab-button px-4 py-3 rounded-t-lg whitespace-nowrap" data-tab="nfl-picks">
+                    <i class="fas fa-football-ball mr-2"></i>Picks • NFL
+                </button>
+                <button class="tab-button px-4 py-3 rounded-t-lg whitespace-nowrap" data-tab="ncaa-picks">
+                    <i class="fas fa-graduation-cap mr-2"></i>Picks • NCAA
+                </button>
+                <button class="tab-button px-4 py-3 rounded-t-lg whitespace-nowrap" data-tab="leaderboards">
+                    <i class="fas fa-trophy mr-2"></i>Leaderboards
+                </button>
+                <button class="tab-button px-4 py-3 rounded-t-lg whitespace-nowrap" data-tab="profile">
+                    <i class="fas fa-user mr-2"></i>Profile
+                </button>
+                <button class="tab-button px-4 py-3 rounded-t-lg whitespace-nowrap" data-tab="feedback">
+                    <i class="fas fa-comment mr-2"></i>Tester Feedback
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        <!-- Lounge Tab -->
+        <div id="lounge" class="tab-content">
+            <div class="text-center mb-8">
+                <h2 class="text-4xl font-bold mb-4">Welcome to Tedo's Sports Lounge</h2>
+                <p class="text-xl opacity-75 mb-6">The ultimate fantasy football experience with Smoove Coins</p>
+                
+                <div id="newUserInstructions" class="hidden accent-bg text-black p-4 rounded-lg mb-6">
+                    <h3 class="font-bold mb-2">🏈 New to the platform?</h3>
+                    <p class="mb-2">👤 Go to Profile → Complete your setup</p>
+                    <ul class="text-sm space-y-1">
+                        <li>• Upload your avatar</li>
+                        <li>• Set your display name</li>
+                        <li>• Choose your favorite teams</li>
+                    </ul>
+                    <p class="mt-2 font-semibold">Then start making your NFL picks! 🎯</p>
+                </div>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-6">
+                <!-- This Week's Highlights -->
+                <div class="game-card rounded-lg p-6">
+                    <h3 class="text-xl font-bold mb-4 accent-bg text-black p-2 rounded">📈 This Week's Action</h3>
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center">
+                            <span>Active Week</span>
+                            <span class="accent-bg text-black px-2 py-1 rounded font-bold">Week 1</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span>Games Available</span>
+                            <span class="text-green-400 font-bold">16 Games</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span>Your Progress</span>
+                            <span id="userProgress" class="text-blue-400 font-bold">0/16 picks</span>
+                        </div>
+                    </div>
+                    <button onclick="switchTab('nfl-picks')" class="w-full accent-bg text-black py-2 rounded mt-4 font-semibold hover:opacity-90">
+                        Make Your Picks (NFL)
+                    </button>
+                </div>
+
+                <!-- Latest Updates -->
+                <div class="game-card rounded-lg p-6">
+                    <h3 class="text-xl font-bold mb-4 accent-bg text-black p-2 rounded">🔥 Latest Updates</h3>
+                    <div class="space-y-3 text-sm">
+                        <div class="border-l-4 border-yellow-400 pl-3">
+                            <p class="font-semibold">Week 1 is Live!</p>
+                            <p class="opacity-75">All NFL games available for picks</p>
+                        </div>
+                        <div class="border-l-4 border-blue-400 pl-3">
+                            <p class="font-semibold">Premium Features</p>
+                            <p class="opacity-75">NCAA picks for USC, Purdue, Notre Dame, Georgia, Miami</p>
+                        </div>
+                        <div class="border-l-4 border-green-400 pl-3">
+                            <p class="font-semibold">Smoove Coins</p>
+                            <p class="opacity-75">Earn 5 coins per correct prediction!</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Smoove Spots Videos -->
+                <div class="game-card rounded-lg p-6">
+                    <h3 class="text-xl font-bold mb-4 accent-bg text-black p-2 rounded">🎥 Smoove Spots</h3>
+                    <div class="space-y-3">
+                        <div class="aspect-video bg-black rounded-lg flex items-center justify-center">
+                            <a href="https://www.youtube.com/watch?v=IFae8VYvT3I" target="_blank" 
+                               class="text-center hover:text-yellow-400 transition-colors">
+                                <i class="fab fa-youtube text-4xl mb-2"></i>
+                                <p class="text-sm">Latest Football Analysis</p>
+                            </a>
+                        </div>
+                        <div class="text-sm space-y-2">
+                            <p>• Weekly game breakdowns</p>
+                            <p>• Expert predictions</p>
+                            <p>• Player spotlights</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- NFL Picks Tab -->
+        <div id="nfl-picks" class="tab-content hidden">
+            <div class="mb-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-3xl font-bold">NFL Picks</h2>
+                    <div class="flex items-center space-x-4">
+                        <label class="font-semibold">Week:</label>
+                        <select id="weekSelector" class="dropdown-content rounded px-3 py-2 font-semibold">
+                            <option value="1">Week 1</option>
+                            <option value="2">Week 2</option>
+                            <option value="3">Week 3</option>
+                            <option value="4">Week 4</option>
+                            <option value="5">Week 5</option>
+                            <option value="6">Week 6</option>
+                            <option value="7">Week 7</option>
+                            <option value="8">Week 8</option>
+                            <option value="9">Week 9</option>
+                            <option value="10">Week 10</option>
+                            <option value="11">Week 11</option>
+                            <option value="12">Week 12</option>
+                            <option value="13">Week 13</option>
+                            <option value="14">Week 14</option>
+                            <option value="15">Week 15</option>
+                            <option value="16">Week 16</option>
+                            <option value="17">Week 17</option>
+                            <option value="18">Week 18</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div id="picksInstructions" class="accent-bg text-black p-4 rounded-lg mb-6">
+                    <p class="font-semibold mb-2">📋 How to Play:</p>
+                    <p class="text-sm">Select the team you think will win each game. Earn 5 Smoove Coins for each correct prediction!</p>
+                </div>
+            </div>
+
+            <div id="gamesList" class="space-y-4">
+                <!-- Games will be populated here -->
+            </div>
+
+            <div class="text-center mt-8">
+                <button id="submitPicksBtn" class="accent-bg text-black px-8 py-3 rounded-lg font-bold text-lg hover:opacity-90 disabled:opacity-50" disabled>
+                    Submit Picks
+                </button>
+                <p class="text-sm mt-2 opacity-75">Make your selections above to enable submission</p>
+            </div>
+        </div>
+
+        <!-- NCAA Picks Tab -->
+        <div id="ncaa-picks" class="tab-content hidden">
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-bold mb-4">NCAA Picks</h2>
+                <div id="ncaaLocked" class="accent-bg text-black p-6 rounded-lg">
+                    <i class="fas fa-lock text-2xl mb-3"></i>
+                    <h3 class="text-xl font-bold mb-2">Premium Feature</h3>
+                    <p class="mb-4">Access exclusive NCAA picks for USC, Purdue, Notre Dame, Georgia, and Miami</p>
+                    <button onclick="switchTab('profile')" class="bg-black text-yellow-400 px-6 py-2 rounded-lg font-semibold hover:opacity-90">
+                        Upgrade to Lounge Pass
+                    </button>
+                </div>
+                
+                <div id="ncaaUnlocked" class="hidden">
+                    <p class="text-xl mb-6">Premium NCAA Games - Week 1</p>
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div class="game-card rounded-lg p-4">
+                            <div class="text-center mb-3">
+                                <div class="text-sm opacity-75">Saturday 3:30 PM</div>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <div class="team-option p-3 rounded flex-1 mr-2 text-center" data-team="USC">
+                                    <div class="font-bold">USC Trojans</div>
+                                </div>
+                                <div class="text-xl font-bold">VS</div>
+                                <div class="team-option p-3 rounded flex-1 ml-2 text-center" data-team="Notre Dame">
+                                    <div class="font-bold">Notre Dame</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="game-card rounded-lg p-4">
+                            <div class="text-center mb-3">
+                                <div class="text-sm opacity-75">Saturday 7:00 PM</div>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <div class="team-option p-3 rounded flex-1 mr-2 text-center" data-team="Georgia">
+                                    <div class="font-bold">Georgia Bulldogs</div>
+                                </div>
+                                <div class="text-xl font-bold">VS</div>
+                                <div class="team-option p-3 rounded flex-1 ml-2 text-center" data-team="Miami">
+                                    <div class="font-bold">Miami Hurricanes</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Leaderboards Tab -->
+        <div id="leaderboards" class="tab-content hidden">
+            <div class="mb-6">
+                <h2 class="text-3xl font-bold mb-4">🏆 Week 1 Leaderboard</h2>
+                <div class="flex justify-between items-center mb-4">
+                    <div class="text-lg">
+                        <span class="accent-bg text-black px-3 py-1 rounded font-bold">Current Week: 1</span>
+                    </div>
+                    <div class="text-sm opacity-75">
+                        Updates in real-time as picks are submitted
+                    </div>
+                </div>
+            </div>
+
+            <div id="leaderboardContent" class="game-card rounded-lg p-6">
+                <div id="emptyLeaderboard" class="text-center py-12">
+                    <i class="fas fa-trophy text-6xl opacity-30 mb-4"></i>
+                    <h3 class="text-2xl font-bold mb-2">No picks submitted yet</h3>
+                    <p class="opacity-75 mb-6">Be the first to make your Week 1 predictions!</p>
+                    <button onclick="switchTab('nfl-picks')" class="accent-bg text-black px-6 py-3 rounded-lg font-semibold hover:opacity-90">
+                        Make Your Picks
+                    </button>
+                </div>
+                
+                <div id="leaderboardTable" class="hidden">
+                    <div class="grid grid-cols-5 gap-4 mb-4 font-bold text-sm uppercase tracking-wide opacity-75 border-b border-gray-600 pb-2">
+                        <div>Rank</div>
+                        <div>Player</div>
+                        <div>Points</div>
+                        <div>Correct</div>
+                        <div>Coins</div>
+                    </div>
+                    <div id="leaderboardRows">
+                        <!-- Real user data will be populated here -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-6 text-center">
+                <div class="game-card rounded-lg p-4 inline-block">
+                    <h4 class="font-bold mb-2">Scoring System</h4>
+                    <div class="text-sm space-y-1">
+                        <p>✅ Correct Pick: <span class="accent-bg text-black px-2 py-1 rounded">10 points</span></p>
+                        <p>🤝 Push (Tie): <span class="bg-gray-600 px-2 py-1 rounded">5 points</span></p>
+                        <p>❌ Wrong Pick: <span class="bg-red-600 px-2 py-1 rounded">0 points</span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile Tab -->
+        <div id="profile" class="tab-content hidden">
+            <h2 class="text-3xl font-bold mb-6">Profile Settings</h2>
+            
+            <div class="grid md:grid-cols-2 gap-6">
+                <!-- Account Settings -->
+                <div class="game-card rounded-lg p-6">
+                    <h3 class="text-xl font-bold mb-4">Account Settings</h3>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-semibold mb-2">Display Name</label>
+                            <input type="text" id="displayNameInput" class="w-full p-3 rounded dark-bg border border-gray-600 focus:border-yellow-400" 
+                                   placeholder="Enter your display name">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-semibold mb-2">Avatar</label>
+                            <div class="flex items-center space-x-4 mb-3">
+                                <img id="avatarPreview" class="avatar-preview" src="https://via.placeholder.com/60x60/2D5A5A/FFD700?text=User" alt="Avatar Preview">
+                                <div class="flex-1">
+                                    <input type="file" id="avatarUpload" accept="image/*" class="hidden">
+                                    <button onclick="document.getElementById('avatarUpload').click()" 
+                                            class="accent-bg text-black px-4 py-2 rounded font-semibold hover:opacity-90">
+                                        Upload Image
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="text-sm opacity-75">Or choose from preset avatars:</div>
+                            <div class="grid grid-cols-6 gap-2 mt-2">
+                                <img class="avatar-option w-10 h-10 rounded-full cursor-pointer border-2 border-transparent hover:border-yellow-400" 
+                                     src="https://via.placeholder.com/40x40/FF6B6B/FFFFFF?text=🏈" onclick="selectAvatar(this.src)">
+                                <img class="avatar-option w-10 h-10 rounded-full cursor-pointer border-2 border-transparent hover:border-yellow-400" 
+                                     src="https://via.placeholder.com/40x40/4ECDC4/FFFFFF?text=⚡" onclick="selectAvatar(this.src)">
+                                <img class="avatar-option w-10 h-10 rounded-full cursor-pointer border-2 border-transparent hover:border-yellow-400" 
+                                     src="https://via.placeholder.com/40x40/45B7D1/FFFFFF?text=🚀" onclick="selectAvatar(this.src)">
+                                <img class="avatar-option w-10 h-10 rounded-full cursor-pointer border-2 border-transparent hover:border-yellow-400" 
+                                     src="https://via.placeholder.com/40x40/96CEB4/FFFFFF?text=🎯" onclick="selectAvatar(this.src)">
+                                <img class="avatar-option w-10 h-10 rounded-full cursor-pointer border-2 border-transparent hover:border-yellow-400" 
+                                     src="https://via.placeholder.com/40x40/FFEAA7/000000?text=⭐" onclick="selectAvatar(this.src)">
+                                <img class="avatar-option w-10 h-10 rounded-full cursor-pointer border-2 border-transparent hover:border-yellow-400" 
+                                     src="https://via.placeholder.com/40x40/DDA0DD/FFFFFF?text=👑" onclick="selectAvatar(this.src)">
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-semibold mb-2">Timezone Preference</label>
+                            <select id="timezoneSelect" class="w-full p-3 rounded dropdown-content">
+                                <option value="ET">Eastern Time (ET)</option>
+                                <option value="CT">Central Time (CT)</option>
+                                <option value="MT">Mountain Time (MT)</option>
+                                <option value="PT">Pacific Time (PT)</option>
+                            </select>
+                        </div>
+                        
+                        <button id="saveProfileBtn" class="accent-bg text-black px-6 py-2 rounded font-semibold hover:opacity-90">
+                            Save Profile
+                        </button>
+                    </div>
+                </div>
+
+                <!-- User Stats & Admin -->
+                <div class="space-y-6">
+                    <!-- Membership Plan -->
+                    <div class="game-card rounded-lg p-6">
+                        <h3 class="text-xl font-bold mb-4">Membership Plan</h3>
+                        <div id="membershipContent">
+                            <div id="freeUser">
+                                <div class="flex justify-between items-center mb-4">
+                                    <span class="font-semibold">Free Insider</span>
+                                    <span class="bg-gray-600 px-3 py-1 rounded text-sm">Current Plan</span>
+                                </div>
+                                <button id="upgradeBtn" class="w-full accent-bg text-black py-3 rounded-lg font-bold hover:opacity-90">
+                                    Upgrade to Lounge Pass - $7.99/month
+                                </button>
+                            </div>
+                            
+                            <div id="premiumUser" class="hidden">
+                                <div class="flex justify-between items-center mb-4">
+                                    <span class="font-semibold">Lounge Pass</span>
+                                    <span class="admin-badge px-3 py-1 rounded text-sm">Premium</span>
+                                </div>
+                                <div class="text-sm space-y-1">
+                                    <p>✅ NCAA Picks Unlocked</p>
+                                    <p>✅ 1.5x Smoove Coin Bonus</p>
+                                    <p>✅ Private Leagues</p>
+                                    <p>✅ Ad-Free Experience</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Smoove Coins -->
+                    <div class="game-card rounded-lg p-6">
+                        <h3 class="text-xl font-bold mb-4">Smoove Coins</h3>
+                        <div class="text-center">
+                            <div id="coinBalance" class="text-4xl font-bold accent-bg text-black inline-block px-6 py-3 rounded-lg">0</div>
+                            <p class="text-sm mt-2 opacity-75">Current Balance</p>
+                        </div>
+                        <div class="mt-4 text-sm space-y-1">
+                            <p>• 5 coins per correct pick</p>
+                            <p>• 25 bonus coins for perfect week</p>
+                            <p>• 10 coins for daily login</p>
+                        </div>
+                    </div>
+
+                    <!-- Admin Dashboard (Only for sonlyconsulting@gmail.com) -->
+                    <div id="adminDashboard" class="game-card rounded-lg p-6 hidden">
+                        <h3 class="text-xl font-bold mb-4 admin-badge inline-block px-3 py-2 rounded">
+                            <i class="fas fa-crown mr-2"></i>Admin Dashboard
+                        </h3>
+                        <div class="space-y-4">
+                            <div class="grid grid-cols-2 gap-4 text-sm">
+                                <div class="text-center">
+                                    <div id="totalUsers" class="text-2xl font-bold accent-bg text-black inline-block px-3 py-2 rounded">0</div>
+                                    <p class="opacity-75">Total Users</p>
+                                </div>
+                                <div class="text-center">
+                                    <div id="totalPicks" class="text-2xl font-bold accent-bg text-black inline-block px-3 py-2 rounded">0</div>
+                                    <p class="opacity-75">Total Picks</p>
+                                </div>
+                            </div>
+                            <div class="space-y-2">
+                                <button onclick="exportUserData()" class="w-full bg-blue-600 hover:bg-blue-700 py-2 px-4 rounded text-sm">
+                                    <i class="fas fa-download mr-2"></i>Export User Data
+                                </button>
+                                <button onclick="exportFeedback()" class="w-full bg-green-600 hover:bg-green-700 py-2 px-4 rounded text-sm">
+                                    <i class="fas fa-comments mr-2"></i>Export Feedback
+                                </button>
+                                <button onclick="viewSystemLogs()" class="w-full bg-purple-600 hover:bg-purple-700 py-2 px-4 rounded text-sm">
+                                    <i class="fas fa-list mr-2"></i>System Logs
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sub-pages accessible from Profile -->
+            <div class="mt-8 grid md:grid-cols-3 gap-4">
+                <button onclick="showMembership()" class="game-card p-4 rounded-lg text-center hover:opacity-80">
+                    <i class="fas fa-crown text-3xl mb-2 text-yellow-400"></i>
+                    <h4 class="font-bold">Membership</h4>
+                    <p class="text-sm opacity-75">Upgrade options</p>
+                </button>
+                <button onclick="showRules()" class="game-card p-4 rounded-lg text-center hover:opacity-80">
+                    <i class="fas fa-book text-3xl mb-2 text-blue-400"></i>
+                    <h4 class="font-bold">Rules</h4>
+                    <p class="text-sm opacity-75">Contest guidelines</p>
+                </button>
+                <button onclick="showInvestor()" class="game-card p-4 rounded-lg text-center hover:opacity-80">
+                    <i class="fas fa-chart-line text-3xl mb-2 text-green-400"></i>
+                    <h4 class="font-bold">Investor Relations</h4>
+                    <p class="text-sm opacity-75">Company documents</p>
+                </button>
+            </div>
+        </div>
+
+        <!-- Feedback Tab -->
+        <div id="feedback" class="tab-content hidden">
+            <h2 class="text-3xl font-bold mb-6">Tester Feedback</h2>
+            
+            <div class="game-card rounded-lg p-6 max-w-2xl mx-auto">
+                <div class="mb-6">
+                    <p class="text-lg mb-4">Help us improve Tedo's Football Lounge! Your feedback is valuable.</p>
+                </div>
+
+                <form id="feedbackForm" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-semibold mb-2">Feedback Category</label>
+                        <select id="feedbackCategory" class="w-full p-3 rounded dropdown-content" required>
+                            <option value="">Select category...</option>
+                            <option value="bug">Bug Report</option>
+                            <option value="feature">Feature Request</option>
+                            <option value="ui">User Interface</option>
+                            <option value="performance">Performance</option>
+                            <option value="general">General Feedback</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold mb-2">Rating (1-5 stars)</label>
+                        <div class="flex space-x-2">
+                            <button type="button" class="star-rating text-2xl" data-rating="1">⭐</button>
+                            <button type="button" class="star-rating text-2xl" data-rating="2">⭐</button>
+                            <button type="button" class="star-rating text-2xl" data-rating="3">⭐</button>
+                            <button type="button" class="star-rating text-2xl" data-rating="4">⭐</button>
+                            <button type="button" class="star-rating text-2xl" data-rating="5">⭐</button>
+                        </div>
+                        <input type="hidden" id="rating" name="rating" required>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold mb-2">Your Feedback</label>
+                        <textarea id="feedbackText" rows="6" class="w-full p-3 rounded dark-bg border border-gray-600 focus:border-yellow-400" 
+                                  placeholder="Please describe your experience, any issues, or suggestions..." required></textarea>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold mb-2">Contact Email (optional)</label>
+                        <input type="email" id="contactEmail" class="w-full p-3 rounded dark-bg border border-gray-600 focus:border-yellow-400" 
+                               placeholder="your@email.com">
+                    </div>
+
+                    <div class="flex space-x-4">
+                        <button type="submit" class="flex-1 accent-bg text-black py-3 rounded-lg font-bold hover:opacity-90">
+                            <i class="fas fa-paper-plane mr-2"></i>Submit Feedback
+                        </button>
+                        <button type="button" onclick="clearFeedbackForm()" class="bg-gray-600 hover:bg-gray-700 px-6 py-3 rounded-lg">
+                            Clear
+                        </button>
+                    </div>
+                </form>
+
+                <div class="mt-6 text-sm opacity-75 text-center">
+                    <p>Feedback will be sent directly to <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="a8dbc7c6c4d1cbc7c6dbddc4dcc1c6cfe8cfc5c9c1c486cbc7c5">[email&#160;protected]</a></p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Auth Modal -->
+    <div id="authModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="dark-bg rounded-lg p-8 max-w-md w-full mx-4">
+            <div class="text-center mb-6">
+                <h3 id="authTitle" class="text-2xl font-bold">Login to Tedo's Lounge</h3>
+            </div>
+            
+            <form id="authForm" class="space-y-4">
+                <div>
+                    <input type="email" id="authEmail" placeholder="Email address" required
+                           class="w-full p-3 rounded dark-bg border border-gray-600 focus:border-yellow-400">
+                </div>
+                <div>
+                    <input type="password" id="authPassword" placeholder="Password" required
+                           class="w-full p-3 rounded dark-bg border border-gray-600 focus:border-yellow-400">
+                </div>
+                <div id="confirmPasswordDiv" class="hidden">
+                    <input type="password" id="confirmPassword" placeholder="Confirm Password"
+                           class="w-full p-3 rounded dark-bg border border-gray-600 focus:border-yellow-400">
+                </div>
+                <button type="submit" id="authSubmit" class="w-full accent-bg text-black py-3 rounded-lg font-bold hover:opacity-90">
+                    Login
+                </button>
+            </form>
+            
+            <div class="text-center mt-4">
+                <button id="authToggle" class="text-yellow-400 hover:underline">
+                    Need an account? Sign up
+                </button>
+            </div>
+            
+            <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div id="confirmModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="dark-bg rounded-lg p-6 max-w-md w-full mx-4">
+            <h3 class="text-xl font-bold mb-4">Confirm Your Picks</h3>
+            <div id="confirmContent"></div>
+            <div class="flex space-x-4 mt-6">
+                <button id="confirmSubmit" class="flex-1 accent-bg text-black py-2 rounded font-semibold">Confirm Picks</button>
+                <button onclick="closeConfirmModal()" class="flex-1 bg-gray-600 py-2 rounded">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+        // Global state
+        let currentUser = null;
+        let currentWeek = 1;
+        let userPicks = {};
+        let gameData = {};
+        let leaderboardData = [];
+        let isLogin = true;
+
+        // NFL Schedule Data
+        const nflSchedule = {
+            1: [
+                { id: 'W1-GAME-1', home: 'Philadelphia Eagles', away: 'Dallas Cowboys', time: '2025-09-04 20:20:00', status: 'FINAL', homeScore: 27, awayScore: 20 },
+                { id: 'W1-GAME-2', home: 'Los Angeles Chargers', away: 'Kansas City Chiefs', time: '2025-09-05 20:00:00', status: 'UPCOMING' },
+                { id: 'W1-GAME-3', home: 'New England Patriots', away: 'Las Vegas Raiders', time: '2025-09-07 13:00:00', status: 'LIVE', homeScore: 14, awayScore: 10 },
+                { id: 'W1-GAME-4', home: 'New York Jets', away: 'Pittsburgh Steelers', time: '2025-09-07 13:00:00', status: 'UPCOMING' },
+                { id: 'W1-GAME-5', home: 'Indianapolis Colts', away: 'Miami Dolphins', time: '2025-09-07 13:00:00', status: 'FINAL', homeScore: 24, awayScore: 17 },
+                { id: 'W1-GAME-6', home: 'New Orleans Saints', away: 'Arizona Cardinals', time: '2025-09-07 13:00:00', status: 'UPCOMING' },
+                { id: 'W1-GAME-7', home: 'Washington Commanders', away: 'New York Giants', time: '2025-09-07 13:00:00', status: 'UPCOMING' },
+                { id: 'W1-GAME-8', home: 'Jacksonville Jaguars', away: 'Carolina Panthers', time: '2025-09-07 13:00:00', status: 'UPCOMING' },
+                { id: 'W1-GAME-9', home: 'Cleveland Browns', away: 'Cincinnati Bengals', time: '2025-09-07 13:00:00', status: 'UPCOMING' },
+                { id: 'W1-GAME-10', home: 'Atlanta Falcons', away: 'Tampa Bay Buccaneers', time: '2025-09-07 13:00:00', status: 'UPCOMING' },
+                { id: 'W1-GAME-11', home: 'Denver Broncos', away: 'Tennessee Titans', time: '2025-09-07 16:05:00', status: 'UPCOMING' },
+                { id: 'W1-GAME-12', home: 'Seattle Seahawks', away: 'San Francisco 49ers', time: '2025-09-07 16:05:00', status: 'UPCOMING' },
+                { id: 'W1-GAME-13', home: 'Green Bay Packers', away: 'Detroit Lions', time: '2025-09-07 16:25:00', status: 'UPCOMING' },
+                { id: 'W1-GAME-14', home: 'Los Angeles Rams', away: 'Houston Texans', time: '2025-09-07 16:25:00', status: 'UPCOMING' },
+                { id: 'W1-GAME-15', home: 'Buffalo Bills', away: 'Baltimore Ravens', time: '2025-09-07 20:20:00', status: 'UPCOMING' },
+                { id: 'W1-GAME-16', home: 'Chicago Bears', away: 'Minnesota Vikings', time: '2025-09-08 20:15:00', status: 'UPCOMING' }
+            ]
+        };
+
+        // Team website URLs
+        const teamWebsites = {
+            'Philadelphia Eagles': 'https://www.philadelphiaeagles.com',
+            'Dallas Cowboys': 'https://www.dallascowboys.com',
+            'Los Angeles Chargers': 'https://www.chargers.com',
+            'Kansas City Chiefs': 'https://www.chiefs.com',
+            'New England Patriots': 'https://www.patriots.com',
+            'Las Vegas Raiders': 'https://www.raiders.com',
+            'New York Jets': 'https://www.newyorkjets.com',
+            'Pittsburgh Steelers': 'https://www.steelers.com',
+            'Indianapolis Colts': 'https://www.colts.com',
+            'Miami Dolphins': 'https://www.miamidolphins.com',
+            'New Orleans Saints': 'https://www.neworleanssaints.com',
+            'Arizona Cardinals': 'https://www.azcardinals.com',
+            'Washington Commanders': 'https://www.commanders.com',
+            'New York Giants': 'https://www.giants.com',
+            'Jacksonville Jaguars': 'https://www.jaguars.com',
+            'Carolina Panthers': 'https://www.panthers.com',
+            'Cleveland Browns': 'https://www.clevelandbrowns.com',
+            'Cincinnati Bengals': 'https://www.bengals.com',
+            'Atlanta Falcons': 'https://www.atlantafalcons.com',
+            'Tampa Bay Buccaneers': 'https://www.buccaneers.com',
+            'Denver Broncos': 'https://www.denverbroncos.com',
+            'Tennessee Titans': 'https://www.titansonline.com',
+            'Seattle Seahawks': 'https://www.seahawks.com',
+            'San Francisco 49ers': 'https://www.49ers.com',
+            'Green Bay Packers': 'https://www.packers.com',
+            'Detroit Lions': 'https://www.detroitlions.com',
+            'Los Angeles Rams': 'https://www.therams.com',
+            'Houston Texans': 'https://www.houstontexans.com',
+            'Buffalo Bills': 'https://www.buffalobills.com',
+            'Baltimore Ravens': 'https://www.baltimoreravens.com',
+            'Chicago Bears': 'https://www.chicagobears.com',
+            'Minnesota Vikings': 'https://www.vikings.com'
+        };
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
+            loadUserData();
+            setupEventListeners();
+            loadGameData();
+            updateLeaderboard();
+            showNewUserInstructions();
+        });
+
+        function setupEventListeners() {
+            // Tab navigation
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    switchTab(e.target.closest('.tab-button').dataset.tab);
+                });
+            });
+
+            // Auth button
+            document.getElementById('authButton').addEventListener('click', () => {
+                if (currentUser) {
+                    logout();
+                } else {
+                    showAuthModal();
+                }
+            });
+
+            // Auth form
+            document.getElementById('authForm').addEventListener('submit', handleAuth);
+            document.getElementById('authToggle').addEventListener('click', toggleAuthMode);
+
+            // Profile form
+            document.getElementById('saveProfileBtn').addEventListener('click', saveProfile);
+            document.getElementById('upgradeBtn').addEventListener('click', upgradeToPremium);
+
+            // Avatar upload
+            document.getElementById('avatarUpload').addEventListener('change', handleAvatarUpload);
+
+            // Week selector
+            document.getElementById('weekSelector').addEventListener('change', (e) => {
+                currentWeek = parseInt(e.target.value);
+                loadGameData();
+            });
+
+            // Submit picks
+            document.getElementById('submitPicksBtn').addEventListener('click', showPicksConfirmation);
+            document.getElementById('confirmSubmit').addEventListener('click', submitPicks);
+
+            // Feedback form
+            document.getElementById('feedbackForm').addEventListener('submit', handleFeedback);
+
+            // Star ratings
+            document.querySelectorAll('.star-rating').forEach(star => {
+                star.addEventListener('click', (e) => {
+                    const rating = parseInt(e.target.dataset.rating);
+                    setStarRating(rating);
+                });
+            });
+        }
+
+        function switchTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.add('hidden');
+            });
+
+            // Remove active class from all buttons
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.classList.remove('active');
+            });
+
+            // Show selected tab
+            document.getElementById(tabName).classList.remove('hidden');
+            
+            // Add active class to clicked button
+            document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+
+            // Special handling for protected tabs
+            if ((tabName === 'nfl-picks' || tabName === 'leaderboards' || tabName === 'profile') && !currentUser) {
+                showAuthModal();
+                return;
+            }
+
+            if (tabName === 'ncaa-picks' && (!currentUser || !currentUser.isPremium)) {
+                // Tab content already shows the locked state
+            }
+
+            if (tabName === 'leaderboards') {
+                updateLeaderboard();
+            }
+        }
+
+        function showAuthModal() {
+            document.getElementById('authModal').classList.remove('hidden');
+        }
+
+        function closeAuthModal() {
+            document.getElementById('authModal').classList.add('hidden');
+            document.getElementById('authForm').reset();
+        }
+
+        function toggleAuthMode() {
+            isLogin = !isLogin;
+            const title = document.getElementById('authTitle');
+            const submit = document.getElementById('authSubmit');
+            const toggle = document.getElementById('authToggle');
+            const confirmDiv = document.getElementById('confirmPasswordDiv');
+
+            if (isLogin) {
+                title.textContent = 'Login to Tedo\'s Lounge';
+                submit.textContent = 'Login';
+                toggle.textContent = 'Need an account? Sign up';
+                confirmDiv.classList.add('hidden');
+            } else {
+                title.textContent = 'Sign Up for Tedo\'s Lounge';
+                submit.textContent = 'Sign Up';
+                toggle.textContent = 'Have an account? Login';
+                confirmDiv.classList.remove('hidden');
+            }
+        }
+
+        function handleAuth(e) {
+            e.preventDefault();
+            const email = document.getElementById('authEmail').value;
+            const password = document.getElementById('authPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            if (!isLogin && password !== confirmPassword) {
+                showNotification('Passwords do not match', 'error');
+                return;
+            }
+
+            if (isLogin) {
+                login(email, password);
+            } else {
+                signup(email, password);
+            }
+        }
+
+        function login(email, password) {
+            const users = JSON.parse(localStorage.getItem('tedos_users') || '{}');
+            
+            if (users[email] && users[email].password === password) {
+                currentUser = users[email];
+                currentUser.email = email;
+                updateUserInterface();
+                closeAuthModal();
+                showNotification('Login successful!', 'success');
+                
+                // Show profile setup if new user
+                if (!currentUser.displayName) {
+                    switchTab('profile');
+                    showNotification('Please complete your profile setup', 'info');
+                }
+            } else {
+                showNotification('Invalid email or password', 'error');
+            }
+        }
+
+        function signup(email, password) {
+            const users = JSON.parse(localStorage.getItem('tedos_users') || '{}');
+            
+            if (users[email]) {
+                showNotification('Account already exists', 'error');
+                return;
+            }
+
+            const newUser = {
+                password: password,
+                displayName: '',
+                avatar: 'https://via.placeholder.com/60x60/2D5A5A/FFD700?text=User',
+                timezone: 'ET',
+                coins: 100, // Welcome bonus
+                isPremium: false,
+                joinDate: new Date().toISOString(),
+                picks: {},
+                stats: { correctPicks: 0, totalPicks: 0 }
+            };
+
+            // Check if this is the admin email
+            if (email === 'sonlyconsulting@gmail.com') {
+                newUser.isAdmin = true;
+                newUser.isPremium = true;
+            }
+
+            users[email] = newUser;
+            localStorage.setItem('tedos_users', JSON.stringify(users));
+
+            currentUser = newUser;
+            currentUser.email = email;
+            updateUserInterface();
+            closeAuthModal();
+            switchTab('profile');
+            showNotification('Account created! Please complete your profile.', 'success');
+            
+            updateAdminStats();
+        }
+
+        function logout() {
+            currentUser = null;
+            updateUserInterface();
+            switchTab('lounge');
+            showNotification('Logged out successfully', 'info');
+        }
+
+        function updateUserInterface() {
+            const authButton = document.getElementById('authButton');
+            const userInfo = document.getElementById('userInfo');
+            const adminDashboard = document.getElementById('adminDashboard');
+            const newUserInstructions = document.getElementById('newUserInstructions');
+
+            if (currentUser) {
+                authButton.textContent = 'Logout';
+                userInfo.classList.remove('hidden');
+                userInfo.classList.add('flex');
+                
+                // Update user display
+                document.getElementById('userDisplayName').textContent = currentUser.displayName || 'New User';
+                document.getElementById('userAvatar').src = currentUser.avatar;
+                document.getElementById('userCoins').textContent = `${currentUser.coins} Coins`;
+                document.getElementById('coinBalance').textContent = currentUser.coins;
+
+                // Update profile form
+                document.getElementById('displayNameInput').value = currentUser.displayName || '';
+                document.getElementById('avatarPreview').src = currentUser.avatar;
+                document.getElementById('timezoneSelect').value = currentUser.timezone || 'ET';
+
+                // Show admin dashboard if admin
+                if (currentUser.isAdmin) {
+                    adminDashboard.classList.remove('hidden');
+                    updateAdminStats();
+                }
+
+                // Show premium features if premium
+                if (currentUser.isPremium) {
+                    document.getElementById('freeUser').classList.add('hidden');
+                    document.getElementById('premiumUser').classList.remove('hidden');
+                    document.getElementById('ncaaLocked').classList.add('hidden');
+                    document.getElementById('ncaaUnlocked').classList.remove('hidden');
+                }
+
+                // Hide new user instructions if profile is complete
+                if (currentUser.displayName) {
+                    newUserInstructions.classList.add('hidden');
+                }
+
+                updateUserProgress();
+            } else {
+                authButton.textContent = 'Login';
+                userInfo.classList.add('hidden');
+                adminDashboard.classList.add('hidden');
+                newUserInstructions.classList.add('hidden');
+            }
+        }
+
+        function saveProfile() {
+            if (!currentUser) return;
+
+            const displayName = document.getElementById('displayNameInput').value.trim();
+            const timezone = document.getElementById('timezoneSelect').value;
+
+            if (displayName.length < 2) {
+                showNotification('Display name must be at least 2 characters', 'error');
+                return;
+            }
+
+            currentUser.displayName = displayName;
+            currentUser.timezone = timezone;
+
+            // Save to localStorage
+            const users = JSON.parse(localStorage.getItem('tedos_users') || '{}');
+            users[currentUser.email] = currentUser;
+            localStorage.setItem('tedos_users', JSON.stringify(users));
+
+            updateUserInterface();
+            updateLeaderboard(); // Update leaderboard with new display name
+            showNotification('Profile saved successfully!', 'success');
+        }
+
+        function selectAvatar(src) {
+            document.getElementById('avatarPreview').src = src;
+            if (currentUser) {
+                currentUser.avatar = src;
+            }
+        }
+
+        function handleAvatarUpload(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const avatarSrc = e.target.result;
+                    selectAvatar(avatarSrc);
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function upgradeToPremium() {
+            if (!currentUser) return;
+
+            currentUser.isPremium = true;
+            
+            // Save to localStorage
+            const users = JSON.parse(localStorage.getItem('tedos_users') || '{}');
+            users[currentUser.email] = currentUser;
+            localStorage.setItem('tedos_users', JSON.stringify(users));
+
+            updateUserInterface();
+            showNotification('🎉 Welcome to Lounge Pass! All premium features unlocked!', 'success');
+        }
+
+        function loadGameData() {
+            const gamesList = document.getElementById('gamesList');
+            const games = nflSchedule[currentWeek] || [];
+            
+            gamesList.innerHTML = '';
+            
+            games.forEach(game => {
+                const gameCard = createGameCard(game);
+                gamesList.appendChild(gameCard);
+            });
+
+            updateSubmitButton();
+        }
+
+        function createGameCard(game) {
+            const card = document.createElement('div');
+            card.className = 'game-card rounded-lg p-4';
+            
+            const statusClass = game.status === 'FINAL' ? 'bg-red-600' : 
+                               game.status === 'LIVE' ? 'bg-yellow-600' : 'bg-green-600';
+            
+            const statusText = game.status === 'FINAL' ? `FINAL: ${game.homeScore}-${game.awayScore}` :
+                              game.status === 'LIVE' ? `LIVE: ${game.homeScore || 0}-${game.awayScore || 0}` :
+                              formatGameTime(game.time);
+
+            const canPick = game.status === 'UPCOMING';
+            const currentPick = currentUser && currentUser.picks && currentUser.picks[`week${currentWeek}`] && currentUser.picks[`week${currentWeek}`][game.id];
+
+            card.innerHTML = `
+                <div class="text-center mb-3">
+                    <div class="text-sm ${statusClass} text-white inline-block px-3 py-1 rounded">${statusText}</div>
+                </div>
+                <div class="flex justify-between items-center">
+                    <div class="team-option p-3 rounded flex-1 mr-2 text-center ${canPick ? 'cursor-pointer' : 'opacity-50'} ${currentPick === game.away ? 'selected' : ''}" 
+                         data-game="${game.id}" data-team="${game.away}" ${canPick ? '' : 'style="pointer-events: none;"'}>
+                        <div class="font-bold cursor-pointer" onclick="window.open('${teamWebsites[game.away]}', '_blank')">${game.away}</div>
+                        <div class="text-sm opacity-75">Away</div>
+                    </div>
+                    <div class="text-xl font-bold">@</div>
+                    <div class="team-option p-3 rounded flex-1 ml-2 text-center ${canPick ? 'cursor-pointer' : 'opacity-50'} ${currentPick === game.home ? 'selected' : ''}" 
+                         data-game="${game.id}" data-team="${game.home}" ${canPick ? '' : 'style="pointer-events: none;"'}>
+                        <div class="font-bold cursor-pointer" onclick="window.open('${teamWebsites[game.home]}', '_blank')">${game.home}</div>
+                        <div class="text-sm opacity-75">Home</div>
+                    </div>
+                </div>
+            `;
+
+            // Add click handlers for team selection
+            if (canPick) {
+                card.querySelectorAll('.team-option').forEach(option => {
+                    option.addEventListener('click', (e) => {
+                        if (!currentUser) {
+                            showAuthModal();
+                            return;
+                        }
+                        selectTeam(e.currentTarget);
+                    });
+                });
+            }
+
+            return card;
+        }
+
+        function selectTeam(element) {
+            const gameId = element.dataset.game;
+            const team = element.dataset.team;
+            
+            // Remove selection from other team in same game
+            const gameCard = element.closest('.game-card');
+            gameCard.querySelectorAll('.team-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            
+            // Add selection to clicked team
+            element.classList.add('selected');
+            
+            // Store the pick
+            if (!currentUser.picks) currentUser.picks = {};
+            if (!currentUser.picks[`week${currentWeek}`]) currentUser.picks[`week${currentWeek}`] = {};
+            currentUser.picks[`week${currentWeek}`][gameId] = team;
+            
+            updateSubmitButton();
+            updateUserProgress();
+        }
+
+        function updateSubmitButton() {
+            const submitBtn = document.getElementById('submitPicksBtn');
+            if (!currentUser) {
+                submitBtn.disabled = true;
+                return;
+            }
+
+            const weekPicks = currentUser.picks && currentUser.picks[`week${currentWeek}`] ? currentUser.picks[`week${currentWeek}`] : {};
+            const upcomingGames = (nflSchedule[currentWeek] || []).filter(game => game.status === 'UPCOMING');
+            const pickCount = Object.keys(weekPicks).length;
+            
+            submitBtn.disabled = pickCount === 0;
+            submitBtn.textContent = pickCount > 0 ? `Submit ${pickCount} Picks` : 'Submit Picks';
+        }
+
+        function updateUserProgress() {
+            if (!currentUser) return;
+            
+            const weekPicks = currentUser.picks && currentUser.picks[`week${currentWeek}`] ? currentUser.picks[`week${currentWeek}`] : {};
+            const totalGames = (nflSchedule[currentWeek] || []).length;
+            const pickCount = Object.keys(weekPicks).length;
+            
+            document.getElementById('userProgress').textContent = `${pickCount}/${totalGames} picks`;
+        }
+
+        function showPicksConfirmation() {
+            if (!currentUser) return;
+
+            const weekPicks = currentUser.picks && currentUser.picks[`week${currentWeek}`] ? currentUser.picks[`week${currentWeek}`] : {};
+            const pickCount = Object.keys(weekPicks).length;
+            
+            if (pickCount === 0) return;
+
+            const confirmContent = document.getElementById('confirmContent');
+            confirmContent.innerHTML = `
+                <p class="mb-4">Ready to submit your Week ${currentWeek} picks?</p>
+                <div class="space-y-2 text-sm">
+                    <p>✓ ${pickCount} games selected</p>
+                    <p>✓ Earn 5 coins per correct prediction</p>
+                    <p>✓ Can update until game starts</p>
+                </div>
+            `;
+            
+            document.getElementById('confirmModal').classList.remove('hidden');
+        }
+
+        function closeConfirmModal() {
+            document.getElementById('confirmModal').classList.add('hidden');
+        }
+
+        function submitPicks() {
+            if (!currentUser) return;
+
+            const weekPicks = currentUser.picks && currentUser.picks[`week${currentWeek}`] ? currentUser.picks[`week${currentWeek}`] : {};
+            const pickCount = Object.keys(weekPicks).length;
+            
+            if (pickCount === 0) return;
+
+            // Save picks to localStorage
+            const users = JSON.parse(localStorage.getItem('tedos_users') || '{}');
+            users[currentUser.email] = currentUser;
+            localStorage.setItem('tedos_users', JSON.stringify(users));
+
+            closeConfirmModal();
+            updateLeaderboard();
+            showNotification(`Picks saved! Good luck! 🏈 (${pickCount} games selected)`, 'success');
+        }
+
+        function updateLeaderboard() {
+            const users = JSON.parse(localStorage.getItem('tedos_users') || '{}');
+            const leaderboardRows = document.getElementById('leaderboardRows');
+            const emptyLeaderboard = document.getElementById('emptyLeaderboard');
+            const leaderboardTable = document.getElementById('leaderboardTable');
+            
+            // Filter users who have made picks for the current week
+            const usersWithPicks = Object.entries(users).filter(([email, user]) => {
+                return user.picks && user.picks[`week${currentWeek}`] && Object.keys(user.picks[`week${currentWeek}`]).length > 0;
+            });
+
+            if (usersWithPicks.length === 0) {
+                emptyLeaderboard.classList.remove('hidden');
+                leaderboardTable.classList.add('hidden');
+                return;
+            }
+
+            emptyLeaderboard.classList.add('hidden');
+            leaderboardTable.classList.remove('hidden');
+
+            // Calculate scores and create leaderboard data
+            const leaderboardData = usersWithPicks.map(([email, user]) => {
+                const weekPicks = user.picks[`week${currentWeek}`] || {};
+                let points = 0;
+                let correctPicks = 0;
+                let totalPicks = Object.keys(weekPicks).length;
+
+                // Calculate points based on game results
+                Object.entries(weekPicks).forEach(([gameId, pick]) => {
+                    const game = (nflSchedule[currentWeek] || []).find(g => g.id === gameId);
+                    if (game && game.status === 'FINAL') {
+                        if ((game.homeScore > game.awayScore && pick === game.home) ||
+                            (game.awayScore > game.homeScore && pick === game.away)) {
+                            points += 10;
+                            correctPicks++;
+                        } else if (game.homeScore === game.awayScore) {
+                            points += 5; // Push
+                        }
+                    }
+                });
+
+                return {
+                    email,
+                    displayName: user.displayName || email.split('@')[0],
+                    avatar: user.avatar,
+                    points,
+                    correctPicks,
+                    totalPicks,
+                    coins: user.coins || 0
+                };
+            });
+
+            // Sort by points (descending), then by correct picks
+            leaderboardData.sort((a, b) => {
+                if (b.points !== a.points) return b.points - a.points;
+                return b.correctPicks - a.correctPicks;
+            });
+
+            // Generate leaderboard HTML
+            leaderboardRows.innerHTML = leaderboardData.map((user, index) => `
+                <div class="grid grid-cols-5 gap-4 py-3 border-b border-gray-700 items-center">
+                    <div class="flex items-center space-x-2">
+                        <span class="font-bold text-lg">${index + 1}</span>
+                        ${index < 3 ? '<i class="fas fa-trophy text-yellow-400"></i>' : ''}
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <img src="${user.avatar}" alt="Avatar" class="w-8 h-8 rounded-full">
+                        <span class="font-semibold">${user.displayName}</span>
+                    </div>
+                    <div class="text-center">
+                        <span class="accent-bg text-black px-3 py-1 rounded font-bold">${user.points}</span>
+                    </div>
+                    <div class="text-center">
+                        <span class="text-green-400">${user.correctPicks}/${user.totalPicks}</span>
+                    </div>
+                    <div class="text-center">
+                        <span class="text-yellow-400">${user.coins}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function formatGameTime(timeString) {
+            const date = new Date(timeString);
+            return date.toLocaleDateString('en-US', { 
+                weekday: 'short',
+                month: 'short', 
+                day: 'numeric',
+                hour: 'numeric',
+                minute: '2-digit'
+            });
+        }
+
+        function showNewUserInstructions() {
+            if (currentUser && !currentUser.displayName) {
+                document.getElementById('newUserInstructions').classList.remove('hidden');
+            }
+        }
+
+        function loadUserData() {
+            // This would typically load from server, but we're using localStorage
+            const savedEmail = localStorage.getItem('tedos_current_user');
+            if (savedEmail) {
+                const users = JSON.parse(localStorage.getItem('tedos_users') || '{}');
+                if (users[savedEmail]) {
+                    currentUser = users[savedEmail];
+                    currentUser.email = savedEmail;
+                    updateUserInterface();
+                }
+            }
+        }
+
+        function updateAdminStats() {
+            if (!currentUser || !currentUser.isAdmin) return;
+
+            const users = JSON.parse(localStorage.getItem('tedos_users') || '{}');
+            const totalUsers = Object.keys(users).length;
+            
+            let totalPicks = 0;
+            Object.values(users).forEach(user => {
+                if (user.picks && user.picks[`week${currentWeek}`]) {
+                    totalPicks += Object.keys(user.picks[`week${currentWeek}`]).length;
+                }
+            });
+
+            document.getElementById('totalUsers').textContent = totalUsers;
+            document.getElementById('totalPicks').textContent = totalPicks;
+        }
+
+        function exportUserData() {
+            const users = JSON.parse(localStorage.getItem('tedos_users') || '{}');
+            const data = Object.entries(users).map(([email, user]) => ({
+                email,
+                displayName: user.displayName,
+                joinDate: user.joinDate,
+                isPremium: user.isPremium,
+                coins: user.coins,
+                totalPicks: user.stats ? user.stats.totalPicks : 0,
+                correctPicks: user.stats ? user.stats.correctPicks : 0
+            }));
+
+            downloadJSON(data, 'tedos_users.json');
+            showNotification('User data exported successfully', 'success');
+        }
+
+        function exportFeedback() {
+            const feedback = JSON.parse(localStorage.getItem('tedos_feedback') || '[]');
+            downloadJSON(feedback, 'tedos_feedback.json');
+            showNotification('Feedback data exported successfully', 'success');
+        }
+
+        function viewSystemLogs() {
+            const logs = {
+                users: JSON.parse(localStorage.getItem('tedos_users') || '{}'),
+                feedback: JSON.parse(localStorage.getItem('tedos_feedback') || '[]'),
+                timestamp: new Date().toISOString()
+            };
+            
+            console.log('System Logs:', logs);
+            showNotification('System logs displayed in console', 'info');
+        }
+
+        function downloadJSON(data, filename) {
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function handleFeedback(e) {
+            e.preventDefault();
+            
+            const category = document.getElementById('feedbackCategory').value;
+            const rating = document.getElementById('rating').value;
+            const text = document.getElementById('feedbackText').value;
+            const email = document.getElementById('contactEmail').value;
+
+            if (!category || !rating || !text) {
+                showNotification('Please fill in all required fields', 'error');
+                return;
+            }
+
+            const feedback = {
+                id: Date.now(),
+                category,
+                rating: parseInt(rating),
+                text,
+                email,
+                userEmail: currentUser ? currentUser.email : 'anonymous',
+                displayName: currentUser ? currentUser.displayName : 'Anonymous',
+                timestamp: new Date().toISOString(),
+                device: navigator.userAgent
+            };
+
+            // Save feedback
+            const allFeedback = JSON.parse(localStorage.getItem('tedos_feedback') || '[]');
+            allFeedback.push(feedback);
+            localStorage.setItem('tedos_feedback', JSON.stringify(allFeedback));
+
+            // Create email link
+            const emailSubject = `Tedo's Football Lounge Feedback - ${category}`;
+            const emailBody = `
+User: ${feedback.displayName} (${feedback.userEmail})
+Category: ${category}
+Rating: ${rating}/5 stars
+Date: ${new Date(feedback.timestamp).toLocaleString()}
+
+Feedback:
+${text}
+
+Device: ${feedback.device}
+Contact: ${email || 'Not provided'}
+            `.trim();
+
+            const mailtoLink = `mailto:sonlyconsulting@gmail.com?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
+            window.open(mailtoLink);
+
+            clearFeedbackForm();
+            showNotification('Feedback submitted! Email client opened.', 'success');
+        }
+
+        function setStarRating(rating) {
+            document.getElementById('rating').value = rating;
+            document.querySelectorAll('.star-rating').forEach((star, index) => {
+                if (index < rating) {
+                    star.style.opacity = '1';
+                    star.style.filter = 'hue-rotate(0deg)';
+                } else {
+                    star.style.opacity = '0.3';
+                }
+            });
+        }
+
+        function clearFeedbackForm() {
+            document.getElementById('feedbackForm').reset();
+            document.getElementById('rating').value = '';
+            document.querySelectorAll('.star-rating').forEach(star => {
+                star.style.opacity = '0.3';
+            });
+        }
+
+        function showNotification(message, type = 'info') {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${type}`;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 4000);
+        }
+
+        function showMembership() {
+            // This would show a detailed membership page
+            showNotification('Membership details: Free Insider vs Lounge Pass ($7.99/month)', 'info');
+        }
+
+        function showRules() {
+            // This would show the rules page
+            showNotification('Contest Rules: 10 pts correct, 5 pts push, 0 pts wrong. Picks due before game start.', 'info');
+        }
+
+        function showInvestor() {
+            // This would show investor documents
+            showNotification('Investor Relations: Access company documents and financial reports.', 'info');
+        }
+
+        // Save current user to localStorage for persistence
+        setInterval(() => {
+            if (currentUser) {
+                localStorage.setItem('tedos_current_user', currentUser.email);
+            }
+        }, 5000);
+    </script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/vcd15cbe7772f49c399c6a5babf22c1241717689176015" integrity="sha512-ZpsOmlRQV6y907TI0dKBHq9Md29nnaEIPlkf84rnaERnq6zvWvPUqr2ft8M1aS28oN72PdrCzSjY4U6VaAw1EQ==" data-cf-beacon='{"rayId":"97b9a1c64806dc06","serverTiming":{"name":{"cfExtPri":true,"cfEdge":true,"cfOrigin":true,"cfL4":true,"cfSpeedBrain":true,"cfCacheStatus":true}},"version":"2025.8.0","token":"4edd5f8ec12a48cfa682ab8261b80a79"}' crossorigin="anonymous"></script>
+</body>
+</html>
+    <script id="html_badge_script1">
+        window.__genspark_remove_badge_link = "https://www.genspark.ai/api/html_badge/" +
+            "remove_badge?token=To%2FBnjzloZ3UfQdcSaYfDrtrg65sDn0xfRjBJlZmCkOrJvU5K5Hcc6x3P5HkZisCk%2FEe43q2i6dHyKJL%2FgRRt58hQxJXqT2drtsPtJHmd0MJGBkN9RpBFMH2Y8Y2HfRAe%2FXUD7ldp9FCjgoTj4XJEoEF8BiOIyUV54OrTlzlsc6VxfcXGrKzJjK26yvZvltt0gsDtQqUSsluPuIFK3J8LmWrxHR7mh1FLpKAXiVsxR0S%2ByDIjSfze5nYFNQPuRLEpGiEP6gXm3SS7NSAXdQLgB%2FeJiyDd%2BySKk9efgPA3JZ32oHKReYDnlE%2BF7sHlXkM28XxU4p9nLd%2FIbByjixTHhs%2FTtBnYi2hmRel%2ByEozyskIVfq35Qoow%2BZ3%2Bz%2FLNENTtbvx2sMUqELd6s%2BbpNWPCQD0cLxAlodq4q17jL4GGoTNUNT6J4f7RtBUQ5%2BXt7xKEun5gYzZfS%2FGnnABoEkijX0mxzqzuQNX45F3fiLI2MT9bjA3ZJbKgVrfYh3wumIqPrqHfYmGHCtwxUYFc%2BX6w%3D%3D";
+        window.__genspark_locale = "en-US";
+        window.__genspark_token = "To/BnjzloZ3UfQdcSaYfDrtrg65sDn0xfRjBJlZmCkOrJvU5K5Hcc6x3P5HkZisCk/Ee43q2i6dHyKJL/gRRt58hQxJXqT2drtsPtJHmd0MJGBkN9RpBFMH2Y8Y2HfRAe/XUD7ldp9FCjgoTj4XJEoEF8BiOIyUV54OrTlzlsc6VxfcXGrKzJjK26yvZvltt0gsDtQqUSsluPuIFK3J8LmWrxHR7mh1FLpKAXiVsxR0S+yDIjSfze5nYFNQPuRLEpGiEP6gXm3SS7NSAXdQLgB/eJiyDd+ySKk9efgPA3JZ32oHKReYDnlE+F7sHlXkM28XxU4p9nLd/IbByjixTHhs/TtBnYi2hmRel+yEozyskIVfq35Qoow+Z3+z/LNENTtbvx2sMUqELd6s+bpNWPCQD0cLxAlodq4q17jL4GGoTNUNT6J4f7RtBUQ5+Xt7xKEun5gYzZfS/GnnABoEkijX0mxzqzuQNX45F3fiLI2MT9bjA3ZJbKgVrfYh3wumIqPrqHfYmGHCtwxUYFc+X6w==";
+    </script>
+    
+    <script id="html_notice_dialog_script" src="https://www.genspark.ai/notice_dialog.js"></script>
+    
