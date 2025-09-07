@@ -1,0 +1,1379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tedo's Football Lounge - Smoove Spots Fantasy</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-bg: #2D5A5A;
+            --secondary-bg: #1a365d;
+            --accent-yellow: #FFD700;
+            --text-light: #ffffff;
+            --text-gray: #a0aec0;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--primary-bg) 0%, var(--secondary-bg) 100%);
+            color: var(--text-light);
+            min-height: 100vh;
+        }
+        
+        .btn-primary {
+            background: var(--accent-yellow);
+            color: #000;
+            font-weight: bold;
+            padding: 12px 24px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            background: #e6c200;
+            transform: translateY(-2px);
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 10px 0;
+        }
+        
+        .team-logo {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--accent-yellow);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #000;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .team-logo:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.5);
+        }
+        
+        .game-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 8px 0;
+            transition: all 0.3s ease;
+        }
+        
+        .game-card:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--accent-yellow);
+        }
+        
+        .status-live {
+            background: #ef4444;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .status-final {
+            background: #6b7280;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        
+        .status-upcoming {
+            background: #10b981;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--accent-yellow);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #000;
+            font-weight: bold;
+        }
+        
+        .dropdown {
+            background: var(--secondary-bg);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            color: var(--text-light);
+        }
+        
+        .dropdown option {
+            background: var(--secondary-bg);
+            color: var(--text-light);
+        }
+        
+        .nav-tab {
+            padding: 12px 20px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .nav-tab.active {
+            background: var(--accent-yellow);
+            color: #000;
+        }
+        
+        .nav-tab:hover {
+            background: rgba(255, 215, 0, 0.2);
+        }
+        
+        @media (max-width: 768px) {
+            .nav-tabs {
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+            
+            .nav-tab {
+                padding: 8px 12px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="p-4 border-b border-yellow-400">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <div class="w-12 h-12 bg-yellow-400 rounded-lg flex items-center justify-center text-black font-bold text-xl">
+                    TSL
+                </div>
+                <div>
+                    <h1 class="text-2xl font-bold">Tedo's Sports Lounge</h1>
+                    <p class="text-sm text-gray-300">Smoove Spots NFL & NCAA Football</p>
+                </div>
+            </div>
+            
+            <div id="userInfo" class="hidden flex items-center space-x-4">
+                <div class="flex items-center space-x-2">
+                    <div id="userAvatar" class="avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <span id="displayName" class="font-semibold">Welcome!</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-coins text-yellow-400"></i>
+                    <span id="coinBalance" class="font-bold">0</span>
+                </div>
+                <button onclick="logout()" class="text-red-400 hover:text-red-300">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+            
+            <div id="authButtons" class="flex space-x-2">
+                <button onclick="showLogin()" class="btn-primary">Login</button>
+                <button onclick="showSignup()" class="bg-transparent border border-yellow-400 text-yellow-400 px-4 py-2 rounded hover:bg-yellow-400 hover:text-black">Sign Up</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="p-4">
+        <div class="container mx-auto">
+            <div class="nav-tabs flex space-x-2 overflow-x-auto">
+                <div class="nav-tab active" onclick="showSection('lounge')">
+                    <i class="fas fa-home mr-2"></i>Lounge
+                </div>
+                <div class="nav-tab" onclick="showSection('nfl-picks')">
+                    <i class="fas fa-football-ball mr-2"></i>Picks • NFL
+                </div>
+                <div class="nav-tab" onclick="showSection('ncaa-picks')">
+                    <i class="fas fa-graduation-cap mr-2"></i>Picks • NCAA
+                </div>
+                <div class="nav-tab" onclick="showSection('leaderboards')">
+                    <i class="fas fa-trophy mr-2"></i>Leaderboards
+                </div>
+                <div class="nav-tab" onclick="showSection('profile')">
+                    <i class="fas fa-user mr-2"></i>Profile
+                </div>
+                <div class="nav-tab" onclick="showSection('feedback')">
+                    <i class="fas fa-comment mr-2"></i>Tester Feedback
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container mx-auto p-4">
+        <!-- Lounge Section -->
+        <div id="lounge" class="section">
+            <div class="text-center mb-8">
+                <h2 class="text-4xl font-bold mb-4">Welcome to The Lounge</h2>
+                <p class="text-xl text-gray-300 mb-6">Your premier destination for NFL and NCAA football picks</p>
+                
+                <div id="profileIncompleteAlert" class="hidden bg-yellow-400 text-black p-4 rounded-lg mb-6 mx-auto max-w-md">
+                    <div class="flex items-center">
+                        <i class="fas fa-user-edit mr-3 text-xl"></i>
+                        <div>
+                            <p class="font-bold">Complete Your Profile!</p>
+                            <p class="text-sm">Go to Profile and add your avatar and display name for the full experience.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-6">
+                <div class="card">
+                    <h3 class="text-xl font-bold mb-4 text-yellow-400">
+                        <i class="fas fa-chart-line mr-2"></i>This Week's Vibe
+                    </h3>
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center">
+                            <span>Your Rank</span>
+                            <span class="font-bold text-yellow-400">#<span id="userRank">--</span></span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span>Current Streak</span>
+                            <span class="font-bold text-green-400" id="userStreak">0</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span>Smoove Coins</span>
+                            <span class="font-bold text-yellow-400" id="sidebarCoins">0</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h3 class="text-xl font-bold mb-4 text-yellow-400">
+                        <i class="fas fa-fire mr-2"></i>Epic Games This Week
+                    </h3>
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center text-sm">
+                            <span>Eagles @ Cowboys</span>
+                            <span class="status-final">FINAL</span>
+                        </div>
+                        <div class="flex justify-between items-center text-sm">
+                            <span>Chiefs vs Chargers</span>
+                            <span class="status-upcoming">SUN 8:20 PM</span>
+                        </div>
+                        <div class="flex justify-between items-center text-sm">
+                            <span>Bears @ Vikings</span>
+                            <span class="status-upcoming">MON 8:15 PM</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h3 class="text-xl font-bold mb-4 text-yellow-400">
+                        <i class="fab fa-youtube mr-2"></i>Smoove Spots Videos
+                    </h3>
+                    <div class="space-y-3">
+                        <div class="bg-gray-800 rounded-lg p-3 hover:bg-gray-700 cursor-pointer">
+                            <p class="text-sm font-semibold">Week 1 Highlights</p>
+                            <p class="text-xs text-gray-400">Latest picks and analysis</p>
+                        </div>
+                        <div class="bg-gray-800 rounded-lg p-3 hover:bg-gray-700 cursor-pointer">
+                            <p class="text-sm font-semibold">NFL Preview</p>
+                            <p class="text-xs text-gray-400">Season predictions</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- NFL Picks Section -->
+        <div id="nfl-picks" class="section hidden">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-3xl font-bold">NFL Picks</h2>
+                <select id="weekSelector" class="dropdown px-4 py-2 rounded">
+                    <option value="1">Week 1</option>
+                    <option value="2">Week 2</option>
+                    <option value="3">Week 3</option>
+                    <option value="4">Week 4</option>
+                    <option value="5">Week 5</option>
+                    <option value="6">Week 6</option>
+                    <option value="7">Week 7</option>
+                    <option value="8">Week 8</option>
+                    <option value="9">Week 9</option>
+                    <option value="10">Week 10</option>
+                    <option value="11">Week 11</option>
+                    <option value="12">Week 12</option>
+                    <option value="13">Week 13</option>
+                    <option value="14">Week 14</option>
+                    <option value="15">Week 15</option>
+                    <option value="16">Week 16</option>
+                    <option value="17">Week 17</option>
+                    <option value="18">Week 18</option>
+                </select>
+            </div>
+            
+            <div id="gamesContainer" class="space-y-4">
+                <!-- Games will be populated here -->
+            </div>
+            
+            <div class="mt-6 text-center">
+                <button id="submitPicks" onclick="confirmSubmitPicks()" class="btn-primary disabled:opacity-50" disabled>
+                    <i class="fas fa-check mr-2"></i>Submit Picks
+                </button>
+            </div>
+        </div>
+
+        <!-- NCAA Picks Section -->
+        <div id="ncaa-picks" class="section hidden">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-3xl font-bold">NCAA Picks</h2>
+                <div id="premiumRequired" class="text-yellow-400 font-semibold">
+                    <i class="fas fa-crown mr-2"></i>Lounge Pass Required
+                </div>
+            </div>
+            
+            <div id="ncaaGames" class="space-y-4">
+                <div class="game-card">
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center space-x-4">
+                            <div class="team-logo">USC</div>
+                            <span class="font-semibold">USC Trojans</span>
+                        </div>
+                        <div class="text-center">
+                            <span class="text-gray-400">vs</span>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <span class="font-semibold">Notre Dame</span>
+                            <div class="team-logo">ND</div>
+                        </div>
+                    </div>
+                    <div class="mt-3 text-center">
+                        <span class="status-upcoming">SAT 7:30 PM</span>
+                    </div>
+                </div>
+                
+                <div class="game-card">
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center space-x-4">
+                            <div class="team-logo">PUR</div>
+                            <span class="font-semibold">Purdue Boilermakers</span>
+                        </div>
+                        <div class="text-center">
+                            <span class="text-gray-400">vs</span>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <span class="font-semibold">Indiana</span>
+                            <div class="team-logo">IND</div>
+                        </div>
+                    </div>
+                    <div class="mt-3 text-center">
+                        <span class="status-upcoming">SAT 3:30 PM</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Leaderboards Section -->
+        <div id="leaderboards" class="section hidden">
+            <h2 class="text-3xl font-bold mb-6">Leaderboards</h2>
+            
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="card">
+                    <h3 class="text-xl font-bold mb-4 text-yellow-400">Week 1 Rankings</h3>
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center p-3 bg-yellow-400 text-black rounded">
+                            <div class="flex items-center space-x-3">
+                                <span class="font-bold">1.</span>
+                                <div class="avatar text-xs">TM</div>
+                                <span class="font-semibold">TedoMaster</span>
+                            </div>
+                            <div class="text-right">
+                                <div class="font-bold">85 pts</div>
+                                <div class="text-sm">8/10 correct</div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex justify-between items-center p-3 bg-gray-700 rounded">
+                            <div class="flex items-center space-x-3">
+                                <span class="font-bold">2.</span>
+                                <div class="avatar text-xs">GG</div>
+                                <span class="font-semibold">GridironGuru</span>
+                            </div>
+                            <div class="text-right">
+                                <div class="font-bold">75 pts</div>
+                                <div class="text-sm">7/9 correct</div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex justify-between items-center p-3 bg-gray-800 rounded">
+                            <div class="flex items-center space-x-3">
+                                <span class="font-bold">3.</span>
+                                <div class="avatar text-xs">SS</div>
+                                <span class="font-semibold">SmooveSpots</span>
+                            </div>
+                            <div class="text-right">
+                                <div class="font-bold">70 pts</div>
+                                <div class="text-sm">6/8 correct</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h3 class="text-xl font-bold mb-4 text-yellow-400">Season Stats</h3>
+                    <div class="space-y-4">
+                        <div class="flex justify-between">
+                            <span>Total Players</span>
+                            <span class="font-bold">247</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Perfect Weeks</span>
+                            <span class="font-bold">3</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Average Score</span>
+                            <span class="font-bold">62.4 pts</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Coins Distributed</span>
+                            <span class="font-bold">12,450</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile Section -->
+        <div id="profile" class="section hidden">
+            <h2 class="text-3xl font-bold mb-6">Profile</h2>
+            
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="card">
+                    <h3 class="text-xl font-bold mb-4 text-yellow-400">Account Settings</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-semibold mb-2">Display Name</label>
+                            <input type="text" id="profileDisplayName" class="w-full p-3 bg-gray-800 border border-gray-600 rounded text-white" placeholder="Enter display name">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-semibold mb-2">Avatar</label>
+                            <div class="flex space-x-3 flex-wrap">
+                                <div class="avatar cursor-pointer border-2 border-transparent hover:border-yellow-400" onclick="selectAvatar('👤')">👤</div>
+                                <div class="avatar cursor-pointer border-2 border-transparent hover:border-yellow-400" onclick="selectAvatar('🏈')">🏈</div>
+                                <div class="avatar cursor-pointer border-2 border-transparent hover:border-yellow-400" onclick="selectAvatar('⚡')">⚡</div>
+                                <div class="avatar cursor-pointer border-2 border-transparent hover:border-yellow-400" onclick="selectAvatar('🔥')">🔥</div>
+                                <div class="avatar cursor-pointer border-2 border-transparent hover:border-yellow-400" onclick="selectAvatar('👑')">👑</div>
+                                <div class="avatar cursor-pointer border-2 border-transparent hover:border-yellow-400" onclick="selectAvatar('🎯')">🎯</div>
+                            </div>
+                        </div>
+                        
+                        <button onclick="updateProfile()" class="btn-primary w-full">
+                            <i class="fas fa-save mr-2"></i>Save Profile
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h3 class="text-xl font-bold mb-4 text-yellow-400">Membership Status</h3>
+                    <div id="membershipInfo" class="space-y-4">
+                        <div class="flex justify-between items-center">
+                            <span>Current Plan</span>
+                            <span id="currentPlan" class="font-bold">Free Insider</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span>Smoove Coins</span>
+                            <span class="font-bold text-yellow-400" id="profileCoins">0</span>
+                        </div>
+                        
+                        <button id="upgradeButton" onclick="upgradeToPremium()" class="btn-primary w-full">
+                            <i class="fas fa-crown mr-2"></i>Upgrade to Lounge Pass
+                        </button>
+                        
+                        <div id="premiumFeatures" class="hidden">
+                            <h4 class="font-bold text-green-400 mb-2">Premium Features Unlocked!</h4>
+                            <ul class="text-sm space-y-1">
+                                <li><i class="fas fa-check text-green-400 mr-2"></i>NCAA Picks Available</li>
+                                <li><i class="fas fa-check text-green-400 mr-2"></i>1.5x Smoove Coin Bonus</li>
+                                <li><i class="fas fa-check text-green-400 mr-2"></i>Private Leagues</li>
+                                <li><i class="fas fa-check text-green-400 mr-2"></i>Ad-Free Experience</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-6 flex space-x-4">
+                <button onclick="showSection('membership')" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg">
+                    <i class="fas fa-credit-card mr-2"></i>Membership
+                </button>
+                <button onclick="showSection('rules')" class="bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-lg">
+                    <i class="fas fa-gavel mr-2"></i>Rules
+                </button>
+                <button onclick="showSection('investor')" class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg">
+                    <i class="fas fa-chart-line mr-2"></i>Investor Relations
+                </button>
+            </div>
+        </div>
+
+        <!-- Feedback Section -->
+        <div id="feedback" class="section hidden">
+            <h2 class="text-3xl font-bold mb-6">Tester Feedback</h2>
+            
+            <div class="card max-w-2xl mx-auto">
+                <form onsubmit="submitFeedback(event)">
+                    <div class="space-y-6">
+                        <div>
+                            <label class="block text-sm font-semibold mb-2">Feedback Category</label>
+                            <select id="feedbackCategory" class="dropdown w-full p-3 rounded">
+                                <option value="bug">Bug Report</option>
+                                <option value="feature">Feature Request</option>
+                                <option value="ui">User Experience</option>
+                                <option value="general">General Feedback</option>
+                                <option value="premium">Premium Features</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-semibold mb-2">Rating</label>
+                            <div class="flex space-x-2">
+                                <span onclick="setRating(1)" class="rating-star cursor-pointer text-2xl text-gray-400 hover:text-yellow-400">⭐</span>
+                                <span onclick="setRating(2)" class="rating-star cursor-pointer text-2xl text-gray-400 hover:text-yellow-400">⭐</span>
+                                <span onclick="setRating(3)" class="rating-star cursor-pointer text-2xl text-gray-400 hover:text-yellow-400">⭐</span>
+                                <span onclick="setRating(4)" class="rating-star cursor-pointer text-2xl text-gray-400 hover:text-yellow-400">⭐</span>
+                                <span onclick="setRating(5)" class="rating-star cursor-pointer text-2xl text-gray-400 hover:text-yellow-400">⭐</span>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-semibold mb-2">Your Feedback</label>
+                            <textarea id="feedbackText" rows="5" class="w-full p-3 bg-gray-800 border border-gray-600 rounded text-white" placeholder="Tell us about your experience..."></textarea>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-semibold mb-2">Contact Email (Optional)</label>
+                            <input type="email" id="feedbackEmail" class="w-full p-3 bg-gray-800 border border-gray-600 rounded text-white" placeholder="your@email.com">
+                        </div>
+                        
+                        <button type="submit" class="btn-primary w-full">
+                            <i class="fas fa-paper-plane mr-2"></i>Submit Feedback
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Additional Sections -->
+        <div id="membership" class="section hidden">
+            <h2 class="text-3xl font-bold mb-6">Membership Plans</h2>
+            
+            <div class="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+                <div class="card">
+                    <h3 class="text-2xl font-bold mb-4">Free Insider</h3>
+                    <div class="text-3xl font-bold text-yellow-400 mb-4">Free</div>
+                    <ul class="space-y-3 mb-6">
+                        <li class="flex items-center"><i class="fas fa-check text-green-400 mr-3"></i>Full NFL Picks & Leaderboards</li>
+                        <li class="flex items-center"><i class="fas fa-check text-green-400 mr-3"></i>AI Live Score Updates</li>
+                        <li class="flex items-center"><i class="fas fa-check text-green-400 mr-3"></i>Standard Smoove Coin Earning</li>
+                        <li class="flex items-center"><i class="fas fa-times text-red-400 mr-3"></i>NCAA Picks & Leaderboards</li>
+                        <li class="flex items-center"><i class="fas fa-times text-red-400 mr-3"></i>Create & Join Private Leagues</li>
+                    </ul>
+                    <button class="w-full bg-gray-600 text-white py-3 rounded-lg cursor-not-allowed" disabled>Current Plan</button>
+                </div>
+                
+                <div class="card border-2 border-yellow-400">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-2xl font-bold">Lounge Pass</h3>
+                        <span class="bg-yellow-400 text-black px-3 py-1 rounded-full text-sm font-bold">BEST VALUE</span>
+                    </div>
+                    <div class="text-3xl font-bold text-yellow-400 mb-1">$7.99<span class="text-lg text-gray-300">/month</span></div>
+                    <div class="text-sm text-gray-300 mb-4">or $79.99 per year (2 months free)</div>
+                    <ul class="space-y-3 mb-6">
+                        <li class="flex items-center"><i class="fas fa-check text-green-400 mr-3"></i>Full NFL Picks & Leaderboards</li>
+                        <li class="flex items-center"><i class="fas fa-check text-green-400 mr-3"></i>AI Live Score Updates</li>
+                        <li class="flex items-center"><i class="fas fa-check text-green-400 mr-3"></i>1.5x Smoove Coin Bonus</li>
+                        <li class="flex items-center"><i class="fas fa-check text-green-400 mr-3"></i>Full NCAA Picks & Leaderboards</li>
+                        <li class="flex items-center"><i class="fas fa-check text-green-400 mr-3"></i>Create & Join Private Leagues</li>
+                        <li class="flex items-center"><i class="fas fa-check text-green-400 mr-3"></i>100% Ad-Free Experience</li>
+                    </ul>
+                    <button onclick="upgradeToPremium()" class="btn-primary w-full">Upgrade Now (Test)</button>
+                </div>
+            </div>
+        </div>
+        
+        <div id="rules" class="section hidden">
+            <h2 class="text-3xl font-bold mb-6">Official Rules</h2>
+            <div class="card max-w-4xl mx-auto">
+                <h3 class="text-xl font-bold mb-4 text-yellow-400">Contest Rules & Scoring</h3>
+                <div class="space-y-6 text-gray-300">
+                    <div>
+                        <h4 class="font-bold text-white mb-2">1. Eligibility</h4>
+                        <p>The contest is open to legal residents of their respective countries, states, or provinces where such contests are allowed. Participants must be 18 years of age or older. Employees of Tedo's Sports Lounge are not eligible.</p>
+                    </div>
+                    
+                    <div>
+                        <h4 class="font-bold text-white mb-2">2. How to Play</h4>
+                        <p>Each week, a set of NFL and NCAAF games will be available for picks. Users must select the team they believe will win against the spread for each game. All picks must be submitted before the official start time of each game.</p>
+                    </div>
+                    
+                    <div>
+                        <h4 class="font-bold text-white mb-2">3. Scoring</h4>
+                        <ul class="list-disc list-inside space-y-1">
+                            <li>Correct pick: <strong>10 points</strong></li>
+                            <li>Incorrect pick: <strong>0 points</strong></li>
+                            <li>Push (tie against spread): <strong>5 points</strong></li>
+                        </ul>
+                        <p class="mt-2">The leaderboard is updated in real-time as games conclude.</p>
+                    </div>
+                    
+                    <div>
+                        <h4 class="font-bold text-white mb-2">4. Smoove Coins</h4>
+                        <ul class="list-disc list-inside space-y-1">
+                            <li>5 coins per correct pick</li>
+                            <li>25 bonus coins for perfect week</li>
+                            <li>10 coins for daily login</li>
+                            <li>Premium members receive 1.5x multiplier</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="investor" class="section hidden">
+            <h2 class="text-3xl font-bold mb-6">Investor Relations</h2>
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="card">
+                    <h3 class="text-xl font-bold mb-4 text-yellow-400">Company Documents</h3>
+                    <div class="space-y-3">
+                        <a href="javascript:openPDF('investor-packet')" class="block bg-gray-800 hover:bg-gray-700 p-4 rounded-lg">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h4 class="font-semibold">Investor Packet Q3 2024</h4>
+                                    <p class="text-sm text-gray-400">Business model and projections</p>
+                                </div>
+                                <i class="fas fa-external-link-alt"></i>
+                            </div>
+                        </a>
+                        
+                        <a href="javascript:openPDF('smoove-whitepaper')" class="block bg-gray-800 hover:bg-gray-700 p-4 rounded-lg">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h4 class="font-semibold">Smoove Coins Whitepaper</h4>
+                                    <p class="text-sm text-gray-400">Virtual currency overview</p>
+                                </div>
+                                <i class="fas fa-external-link-alt"></i>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h3 class="text-xl font-bold mb-4 text-yellow-400">Key Metrics</h3>
+                    <div class="space-y-4">
+                        <div class="flex justify-between">
+                            <span>Total Users</span>
+                            <span class="font-bold">247</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Premium Conversion</span>
+                            <span class="font-bold">12.3%</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Monthly Revenue</span>
+                            <span class="font-bold">$2,430</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Retention Rate</span>
+                            <span class="font-bold">78%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modals -->
+    <div id="loginModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-gray-900 p-8 rounded-lg max-w-md w-full mx-4">
+            <h3 class="text-2xl font-bold mb-6">Login to Your Account</h3>
+            <form onsubmit="login(event)">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-semibold mb-2">Email</label>
+                        <input type="email" id="loginEmail" class="w-full p-3 bg-gray-800 border border-gray-600 rounded text-white" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold mb-2">Password</label>
+                        <input type="password" id="loginPassword" class="w-full p-3 bg-gray-800 border border-gray-600 rounded text-white" required>
+                    </div>
+                    <button type="submit" class="btn-primary w-full">Login</button>
+                </div>
+            </form>
+            <button onclick="hideModal('loginModal')" class="mt-4 text-gray-400 hover:text-white">Cancel</button>
+        </div>
+    </div>
+
+    <div id="signupModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-gray-900 p-8 rounded-lg max-w-md w-full mx-4">
+            <h3 class="text-2xl font-bold mb-6">Create Your Account</h3>
+            <form onsubmit="signup(event)">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-semibold mb-2">Email</label>
+                        <input type="email" id="signupEmail" class="w-full p-3 bg-gray-800 border border-gray-600 rounded text-white" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold mb-2">Password</label>
+                        <input type="password" id="signupPassword" class="w-full p-3 bg-gray-800 border border-gray-600 rounded text-white" minlength="6" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold mb-2">Display Name</label>
+                        <input type="text" id="signupDisplayName" class="w-full p-3 bg-gray-800 border border-gray-600 rounded text-white" required>
+                    </div>
+                    <button type="submit" class="btn-primary w-full">Create Account</button>
+                </div>
+            </form>
+            <button onclick="hideModal('signupModal')" class="mt-4 text-gray-400 hover:text-white">Cancel</button>
+        </div>
+    </div>
+
+    <script>
+        // NFL Schedule Data
+        const nflSchedule = {
+            1: [
+                {id: 'W1-GAME-1', homeTeam: 'Philadelphia Eagles', awayTeam: 'Dallas Cowboys', kickoff: '2025-09-04 20:20:00', status: 'FINAL', homeScore: 27, awayScore: 20},
+                {id: 'W1-GAME-2', homeTeam: 'Los Angeles Chargers', awayTeam: 'Kansas City Chiefs', kickoff: '2025-09-05 20:00:00', status: 'UPCOMING'},
+                {id: 'W1-GAME-3', homeTeam: 'New England Patriots', awayTeam: 'Las Vegas Raiders', kickoff: '2025-09-07 13:00:00', status: 'LIVE', homeScore: 14, awayScore: 7},
+                {id: 'W1-GAME-4', homeTeam: 'New York Jets', awayTeam: 'Pittsburgh Steelers', kickoff: '2025-09-07 13:00:00', status: 'LIVE', homeScore: 10, awayScore: 13},
+                {id: 'W1-GAME-5', homeTeam: 'Indianapolis Colts', awayTeam: 'Miami Dolphins', kickoff: '2025-09-07 13:00:00', status: 'FINAL', homeScore: 24, awayScore: 17},
+                {id: 'W1-GAME-6', homeTeam: 'New Orleans Saints', awayTeam: 'Arizona Cardinals', kickoff: '2025-09-07 13:00:00', status: 'FINAL', homeScore: 21, awayScore: 14},
+                {id: 'W1-GAME-7', homeTeam: 'Washington Commanders', awayTeam: 'New York Giants', kickoff: '2025-09-07 13:00:00', status: 'UPCOMING'},
+                {id: 'W1-GAME-8', homeTeam: 'Jacksonville Jaguars', awayTeam: 'Carolina Panthers', kickoff: '2025-09-07 13:00:00', status: 'UPCOMING'},
+                {id: 'W1-GAME-9', homeTeam: 'Cleveland Browns', awayTeam: 'Cincinnati Bengals', kickoff: '2025-09-07 13:00:00', status: 'UPCOMING'},
+                {id: 'W1-GAME-10', homeTeam: 'Atlanta Falcons', awayTeam: 'Tampa Bay Buccaneers', kickoff: '2025-09-07 13:00:00', status: 'UPCOMING'},
+                {id: 'W1-GAME-11', homeTeam: 'Denver Broncos', awayTeam: 'Tennessee Titans', kickoff: '2025-09-07 16:05:00', status: 'UPCOMING'},
+                {id: 'W1-GAME-12', homeTeam: 'Seattle Seahawks', awayTeam: 'San Francisco 49ers', kickoff: '2025-09-07 16:05:00', status: 'UPCOMING'},
+                {id: 'W1-GAME-13', homeTeam: 'Green Bay Packers', awayTeam: 'Detroit Lions', kickoff: '2025-09-07 16:25:00', status: 'UPCOMING'},
+                {id: 'W1-GAME-14', homeTeam: 'Los Angeles Rams', awayTeam: 'Houston Texans', kickoff: '2025-09-07 16:25:00', status: 'UPCOMING'},
+                {id: 'W1-GAME-15', homeTeam: 'Buffalo Bills', awayTeam: 'Baltimore Ravens', kickoff: '2025-09-07 20:20:00', status: 'UPCOMING'},
+                {id: 'W1-GAME-16', homeTeam: 'Chicago Bears', awayTeam: 'Minnesota Vikings', kickoff: '2025-09-08 20:15:00', status: 'UPCOMING'}
+            ]
+        };
+
+        // Team websites mapping
+        const teamWebsites = {
+            'Philadelphia Eagles': 'https://www.philadelphiaeagles.com',
+            'Dallas Cowboys': 'https://www.dallascowboys.com',
+            'Kansas City Chiefs': 'https://www.chiefs.com',
+            'Los Angeles Chargers': 'https://www.chargers.com',
+            'New England Patriots': 'https://www.patriots.com',
+            'Las Vegas Raiders': 'https://www.raiders.com',
+            'New York Jets': 'https://www.newyorkjets.com',
+            'Pittsburgh Steelers': 'https://www.steelers.com',
+            'Indianapolis Colts': 'https://www.colts.com',
+            'Miami Dolphins': 'https://www.miamidolphins.com',
+            'New Orleans Saints': 'https://www.neworleanssaints.com',
+            'Arizona Cardinals': 'https://www.azcardinals.com',
+            'Washington Commanders': 'https://www.commanders.com',
+            'New York Giants': 'https://www.giants.com',
+            'Jacksonville Jaguars': 'https://www.jaguars.com',
+            'Carolina Panthers': 'https://www.panthers.com',
+            'Cleveland Browns': 'https://www.clevelandbrowns.com',
+            'Cincinnati Bengals': 'https://www.bengals.com',
+            'Atlanta Falcons': 'https://www.atlantafalcons.com',
+            'Tampa Bay Buccaneers': 'https://www.buccaneers.com',
+            'Denver Broncos': 'https://www.denverbroncos.com',
+            'Tennessee Titans': 'https://www.titansonline.com',
+            'Seattle Seahawks': 'https://www.seahawks.com',
+            'San Francisco 49ers': 'https://www.49ers.com',
+            'Green Bay Packers': 'https://www.packers.com',
+            'Detroit Lions': 'https://www.detroitlions.com',
+            'Los Angeles Rams': 'https://www.therams.com',
+            'Houston Texans': 'https://www.houstontexans.com',
+            'Buffalo Bills': 'https://www.buffalobills.com',
+            'Baltimore Ravens': 'https://www.baltimoreravens.com',
+            'Chicago Bears': 'https://www.chicagobears.com',
+            'Minnesota Vikings': 'https://www.vikings.com'
+        };
+
+        // App State
+        let currentUser = null;
+        let userPicks = {};
+        let selectedAvatar = '👤';
+        let currentRating = 0;
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAuth();
+            loadWeeklyGames(1);
+            updateCoinDisplays();
+        });
+
+        // Authentication functions
+        function checkAuth() {
+            const user = localStorage.getItem('currentUser');
+            if (user) {
+                currentUser = JSON.parse(user);
+                showUserInfo();
+                checkProfileCompletion();
+            } else {
+                showAuthButtons();
+            }
+        }
+
+        function showUserInfo() {
+            document.getElementById('userInfo').classList.remove('hidden');
+            document.getElementById('authButtons').classList.add('hidden');
+            
+            if (currentUser) {
+                document.getElementById('displayName').textContent = currentUser.displayName || currentUser.email.split('@')[0];
+                document.getElementById('userAvatar').textContent = currentUser.avatar || '👤';
+                updateCoinDisplays();
+            }
+        }
+
+        function showAuthButtons() {
+            document.getElementById('userInfo').classList.add('hidden');
+            document.getElementById('authButtons').classList.remove('hidden');
+        }
+
+        function checkProfileCompletion() {
+            if (currentUser && (!currentUser.displayName || !currentUser.avatar)) {
+                document.getElementById('profileIncompleteAlert').classList.remove('hidden');
+            } else {
+                document.getElementById('profileIncompleteAlert').classList.add('hidden');
+            }
+        }
+
+        function showLogin() {
+            document.getElementById('loginModal').classList.remove('hidden');
+            document.getElementById('loginModal').classList.add('flex');
+        }
+
+        function showSignup() {
+            document.getElementById('signupModal').classList.remove('hidden');
+            document.getElementById('signupModal').classList.add('flex');
+        }
+
+        function hideModal(modalId) {
+            document.getElementById(modalId).classList.add('hidden');
+            document.getElementById(modalId).classList.remove('flex');
+        }
+
+        function login(event) {
+            event.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            const users = JSON.parse(localStorage.getItem('users') || '{}');
+            if (users[email] && users[email].password === password) {
+                currentUser = users[email];
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                showUserInfo();
+                hideModal('loginModal');
+                checkProfileCompletion();
+                alert('Welcome back!');
+            } else {
+                alert('Invalid email or password');
+            }
+        }
+
+        function signup(event) {
+            event.preventDefault();
+            const email = document.getElementById('signupEmail').value;
+            const password = document.getElementById('signupPassword').value;
+            const displayName = document.getElementById('signupDisplayName').value;
+            
+            const users = JSON.parse(localStorage.getItem('users') || '{}');
+            if (users[email]) {
+                alert('Account already exists');
+                return;
+            }
+            
+            const newUser = {
+                email,
+                password,
+                displayName,
+                avatar: '👤',
+                coins: 50, // Welcome bonus
+                isPremium: false,
+                createdAt: new Date().toISOString()
+            };
+            
+            users[email] = newUser;
+            localStorage.setItem('users', JSON.stringify(users));
+            
+            currentUser = newUser;
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            
+            showUserInfo();
+            hideModal('signupModal');
+            alert('Account created successfully! Welcome to Tedo\'s Sports Lounge!');
+        }
+
+        function logout() {
+            currentUser = null;
+            localStorage.removeItem('currentUser');
+            showAuthButtons();
+            showSection('lounge');
+        }
+
+        // Navigation functions
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.add('hidden');
+            });
+            
+            // Remove active class from all tabs
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected section
+            document.getElementById(sectionId).classList.remove('hidden');
+            
+            // Add active class to clicked tab
+            event.target.classList.add('active');
+            
+            // Special handling for certain sections
+            if (sectionId === 'nfl-picks') {
+                loadWeeklyGames(1);
+            } else if (sectionId === 'profile') {
+                loadProfileData();
+            }
+        }
+
+        // NFL Picks functions
+        function loadWeeklyGames(week) {
+            const games = nflSchedule[week] || [];
+            const container = document.getElementById('gamesContainer');
+            
+            container.innerHTML = games.map(game => `
+                <div class="game-card">
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center space-x-4">
+                            <div class="team-logo cursor-pointer" onclick="openTeamWebsite('${game.awayTeam}')">
+                                ${getTeamAbbr(game.awayTeam)}
+                            </div>
+                            <span class="font-semibold">${game.awayTeam}</span>
+                            ${game.awayScore !== undefined ? `<span class="text-lg font-bold">${game.awayScore}</span>` : ''}
+                        </div>
+                        
+                        <div class="text-center">
+                            <span class="text-gray-400">@</span>
+                            <div class="mt-1">
+                                ${getGameStatus(game)}
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center space-x-4">
+                            ${game.homeScore !== undefined ? `<span class="text-lg font-bold">${game.homeScore}</span>` : ''}
+                            <span class="font-semibold">${game.homeTeam}</span>
+                            <div class="team-logo cursor-pointer" onclick="openTeamWebsite('${game.homeTeam}')">
+                                ${getTeamAbbr(game.homeTeam)}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    ${game.status === 'UPCOMING' ? `
+                        <div class="mt-4 flex justify-center space-x-4">
+                            <button onclick="selectTeam('${game.id}', '${game.awayTeam}')" 
+                                    class="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded pick-btn" 
+                                    id="pick-${game.id}-away">
+                                Pick ${game.awayTeam.split(' ').pop()}
+                            </button>
+                            <button onclick="selectTeam('${game.id}', '${game.homeTeam}')" 
+                                    class="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded pick-btn"
+                                    id="pick-${game.id}-home">
+                                Pick ${game.homeTeam.split(' ').pop()}
+                            </button>
+                        </div>
+                    ` : ''}
+                </div>
+            `).join('');
+            
+            updatePickButtons();
+            updateSubmitButton();
+        }
+
+        function getTeamAbbr(teamName) {
+            const abbrs = {
+                'Philadelphia Eagles': 'PHI',
+                'Dallas Cowboys': 'DAL',
+                'Kansas City Chiefs': 'KC',
+                'Los Angeles Chargers': 'LAC',
+                'New England Patriots': 'NE',
+                'Las Vegas Raiders': 'LV',
+                'New York Jets': 'NYJ',
+                'Pittsburgh Steelers': 'PIT',
+                'Indianapolis Colts': 'IND',
+                'Miami Dolphins': 'MIA',
+                'New Orleans Saints': 'NO',
+                'Arizona Cardinals': 'ARI',
+                'Washington Commanders': 'WAS',
+                'New York Giants': 'NYG',
+                'Jacksonville Jaguars': 'JAX',
+                'Carolina Panthers': 'CAR',
+                'Cleveland Browns': 'CLE',
+                'Cincinnati Bengals': 'CIN',
+                'Atlanta Falcons': 'ATL',
+                'Tampa Bay Buccaneers': 'TB',
+                'Denver Broncos': 'DEN',
+                'Tennessee Titans': 'TEN',
+                'Seattle Seahawks': 'SEA',
+                'San Francisco 49ers': 'SF',
+                'Green Bay Packers': 'GB',
+                'Detroit Lions': 'DET',
+                'Los Angeles Rams': 'LAR',
+                'Houston Texans': 'HOU',
+                'Buffalo Bills': 'BUF',
+                'Baltimore Ravens': 'BAL',
+                'Chicago Bears': 'CHI',
+                'Minnesota Vikings': 'MIN'
+            };
+            return abbrs[teamName] || teamName.split(' ').map(w => w[0]).join('');
+        }
+
+        function getGameStatus(game) {
+            if (game.status === 'FINAL') {
+                return '<span class="status-final">FINAL</span>';
+            } else if (game.status === 'LIVE') {
+                return '<span class="status-live">LIVE</span>';
+            } else {
+                const date = new Date(game.kickoff);
+                return `<span class="status-upcoming">${date.toLocaleDateString('en-US', {weekday: 'short'})} ${date.toLocaleTimeString('en-US', {hour: 'numeric', minute: '2-digit'})}</span>`;
+            }
+        }
+
+        function openTeamWebsite(teamName) {
+            if (teamWebsites[teamName]) {
+                window.open(teamWebsites[teamName], '_blank');
+            }
+        }
+
+        function selectTeam(gameId, teamName) {
+            if (!currentUser) {
+                alert('Please log in to make picks');
+                return;
+            }
+            
+            userPicks[gameId] = teamName;
+            updatePickButtons();
+            updateSubmitButton();
+        }
+
+        function updatePickButtons() {
+            Object.keys(userPicks).forEach(gameId => {
+                const selectedTeam = userPicks[gameId];
+                document.querySelectorAll(`[id^="pick-${gameId}"]`).forEach(btn => {
+                    btn.classList.remove('bg-yellow-400', 'text-black');
+                    btn.classList.add('bg-blue-600');
+                });
+                
+                const selectedBtn = document.querySelector(`[onclick*="${gameId}"][onclick*="${selectedTeam}"]`);
+                if (selectedBtn) {
+                    selectedBtn.classList.remove('bg-blue-600');
+                    selectedBtn.classList.add('bg-yellow-400', 'text-black');
+                }
+            });
+        }
+
+        function updateSubmitButton() {
+            const submitBtn = document.getElementById('submitPicks');
+            const picksCount = Object.keys(userPicks).length;
+            
+            if (picksCount > 0) {
+                submitBtn.disabled = false;
+                submitBtn.textContent = `Submit ${picksCount} Picks`;
+            } else {
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Submit Picks';
+            }
+        }
+
+        function confirmSubmitPicks() {
+            if (!currentUser) {
+                alert('Please log in to submit picks');
+                return;
+            }
+            
+            const picksCount = Object.keys(userPicks).length;
+            const coinsPerPick = currentUser.isPremium ? 7.5 : 5; // 1.5x bonus for premium
+            const potentialCoins = picksCount * coinsPerPick;
+            
+            const confirmed = confirm(`Ready to submit your picks?\n\n✓ ${picksCount} games selected\n✓ Earn up to ${potentialCoins} coins for correct predictions\n✓ Can update until games start\n\nConfirm your picks?`);
+            
+            if (confirmed) {
+                submitPicks();
+            }
+        }
+
+        function submitPicks() {
+            const picksData = {
+                week: document.getElementById('weekSelector').value,
+                picks: {...userPicks},
+                submittedAt: new Date().toISOString(),
+                userId: currentUser.email
+            };
+            
+            localStorage.setItem(`picks_${currentUser.email}`, JSON.stringify(picksData));
+            
+            // Award coins for submission (not per correct pick, just for submitting)
+            const submissionBonus = 10;
+            currentUser.coins += submissionBonus;
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            updateCoinDisplays();
+            
+            alert(`Picks submitted successfully! You earned ${submissionBonus} coins for submitting. Good luck! 🏈`);
+            
+            // Reset picks for next submission
+            userPicks = {};
+            updatePickButtons();
+            updateSubmitButton();
+        }
+
+        // Week selector
+        document.getElementById('weekSelector').addEventListener('change', function() {
+            loadWeeklyGames(parseInt(this.value));
+            // Clear current picks when changing weeks
+            userPicks = {};
+            updateSubmitButton();
+        });
+
+        // Profile functions
+        function loadProfileData() {
+            if (currentUser) {
+                document.getElementById('profileDisplayName').value = currentUser.displayName || '';
+                document.getElementById('currentPlan').textContent = currentUser.isPremium ? 'Lounge Pass' : 'Free Insider';
+                
+                if (currentUser.isPremium) {
+                    document.getElementById('upgradeButton').style.display = 'none';
+                    document.getElementById('premiumFeatures').classList.remove('hidden');
+                }
+                
+                updateCoinDisplays();
+            }
+        }
+
+        function selectAvatar(avatar) {
+            selectedAvatar = avatar;
+            document.querySelectorAll('.avatar').forEach(av => {
+                av.classList.remove('border-yellow-400');
+                av.classList.add('border-transparent');
+            });
+            event.target.classList.remove('border-transparent');
+            event.target.classList.add('border-yellow-400');
+        }
+
+        function updateProfile() {
+            if (!currentUser) return;
+            
+            const displayName = document.getElementById('profileDisplayName').value;
+            if (displayName) {
+                currentUser.displayName = displayName;
+            }
+            currentUser.avatar = selectedAvatar;
+            
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            
+            // Update users database
+            const users = JSON.parse(localStorage.getItem('users') || '{}');
+            users[currentUser.email] = currentUser;
+            localStorage.setItem('users', JSON.stringify(users));
+            
+            showUserInfo();
+            checkProfileCompletion();
+            alert('Profile updated successfully!');
+        }
+
+        function upgradeToPremium() {
+            if (!currentUser) {
+                alert('Please log in first');
+                return;
+            }
+            
+            currentUser.isPremium = true;
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            
+            // Update users database
+            const users = JSON.parse(localStorage.getItem('users') || '{}');
+            users[currentUser.email] = currentUser;
+            localStorage.setItem('users', JSON.stringify(users));
+            
+            document.getElementById('currentPlan').textContent = 'Lounge Pass';
+            document.getElementById('upgradeButton').style.display = 'none';
+            document.getElementById('premiumFeatures').classList.remove('hidden');
+            document.getElementById('premiumRequired').style.display = 'none';
+            
+            alert('Welcome to Lounge Pass! 🎉\n\n✓ NCAA Picks Unlocked\n✓ Private Leagues Available\n✓ 1.5x Coin Bonus Active\n✓ Ad-Free Experience');
+        }
+
+        function updateCoinDisplays() {
+            if (currentUser) {
+                const coinBalance = currentUser.coins || 0;
+                document.getElementById('coinBalance').textContent = coinBalance;
+                document.getElementById('sidebarCoins').textContent = coinBalance;
+                document.getElementById('profileCoins').textContent = coinBalance;
+            }
+        }
+
+        // Feedback functions
+        function setRating(rating) {
+            currentRating = rating;
+            const stars = document.querySelectorAll('.rating-star');
+            stars.forEach((star, index) => {
+                if (index < rating) {
+                    star.textContent = '⭐';
+                    star.classList.add('text-yellow-400');
+                    star.classList.remove('text-gray-400');
+                } else {
+                    star.textContent = '⭐';
+                    star.classList.add('text-gray-400');
+                    star.classList.remove('text-yellow-400');
+                }
+            });
+        }
+
+        function submitFeedback(event) {
+            event.preventDefault();
+            
+            const category = document.getElementById('feedbackCategory').value;
+            const text = document.getElementById('feedbackText').value;
+            const email = document.getElementById('feedbackEmail').value || (currentUser ? currentUser.email : 'anonymous');
+            
+            const feedback = {
+                category,
+                rating: currentRating,
+                text,
+                email,
+                user: currentUser ? currentUser.displayName || currentUser.email : 'Anonymous',
+                timestamp: new Date().toISOString(),
+                device: navigator.userAgent
+            };
+            
+            // Save feedback locally
+            const feedbacks = JSON.parse(localStorage.getItem('feedbacks') || '[]');
+            feedbacks.push(feedback);
+            localStorage.setItem('feedbacks', JSON.stringify(feedbacks));
+            
+            // Create email link
+            const subject = `Tedo's Football Lounge Feedback - ${category.charAt(0).toUpperCase() + category.slice(1)}`;
+            const body = `User: ${feedback.user} (${feedback.email})
+Category: ${category}
+Rating: ${currentRating}/5 stars
+Date: ${new Date().toLocaleDateString()}
+
+Feedback:
+${text}
+
+Device: ${feedback.device}
+User ID: ${currentUser ? currentUser.email : 'anonymous'}`;
+            
+            const mailtoLink = `mailto:sonlyconsulting@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            window.open(mailtoLink);
+            
+            alert('Thank you for your feedback! Your email client will open to send the feedback.');
+            
+            // Reset form
+            document.getElementById('feedbackText').value = '';
+            document.getElementById('feedbackEmail').value = '';
+            setRating(0);
+        }
+
+        // PDF functions
+        function openPDF(docType) {
+            let pdfContent = '';
+            
+            if (docType === 'investor-packet') {
+                pdfContent = `
+                    <h1>Tedo's Sports Lounge - Investor Packet Q3 2024</h1>
+                    
+                    <h2>1. Executive Summary</h2>
+                    <p>Tedo's Sports Lounge is a premier online platform for sports enthusiasts to engage in picking games, compete on leaderboards, and be part of a vibrant community. This document outlines our business model, market opportunity, and financial projections for potential investors.</p>
+                    
+                    <h2>2. Market Opportunity</h2>
+                    <p>The sports betting and fantasy sports market is experiencing exponential growth. Our platform carves a unique niche by focusing on a user-friendly, community-driven experience without the high stakes of traditional betting, appealing to a broader casual audience.</p>
+                    
+                    <h2>3. Financial Projections</h2>
+                    <p>We project significant user growth and revenue streams through our tiered membership model, partnerships, and future introduction of premium features. Detailed financial models are available upon request.</p>
+                `;
+            } else if (docType === 'smoove-whitepaper') {
+                pdfContent = `
+                    <h1>Smoove Coins Whitepaper</h1>
+                    
+                    <h2>1. What are Smoove Coins?</h2>
+                    <p>Smoove Coins are the official virtual currency of Tedo's Sports Lounge. They are designed to reward user engagement, skillful picking, and community participation. They are not a cryptocurrency and have no real-world monetary value outside of the platform.</p>
+                    
+                    <h2>2. How to Earn Smoove Coins</h2>
+                    <p>Users can earn Smoove Coins in various ways:</p>
+                    <ul>
+                        <li>5 coins for each correct pick</li>
+                        <li>25 bonus coins for a perfect week</li>
+                        <li>10 coins for logging in daily</li>
+                        <li>Special event bonuses</li>
+                    </ul>
+                    
+                    <h2>3. How to Redeem Smoove Coins</h2>
+                    <p>Smoove Coins can be redeemed in the upcoming 'Prize Shop' for exclusive merchandise, profile badges, entry into special contests, and other digital goods.</p>
+                `;
+            }
+            
+            const newWindow = window.open('', '_blank');
+            newWindow.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>${docType === 'investor-packet' ? 'Investor Packet' : 'Smoove Coins Whitepaper'}</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; margin: 40px; line-height: 1.6; }
+                        h1 { color: #2D5A5A; border-bottom: 3px solid #FFD700; padding-bottom: 10px; }
+                        h2 { color: #1a365d; margin-top: 30px; }
+                        p { margin-bottom: 15px; }
+                        ul { margin-left: 20px; }
+                        li { margin-bottom: 5px; }
+                    </style>
+                </head>
+                <body>
+                    ${pdfContent}
+                    <br><br>
+                    <div style="text-align: center; margin-top: 50px; color: #666;">
+                        <p>© 2024 Tedo's Sports Lounge - Smoove Spots</p>
+                        <p>This document can be downloaded, saved, or printed using your browser's File menu.</p>
+                    </div>
+                </body>
+                </html>
+            `);
+        }
+
+        // Initialize leaderboard data
+        function updateLeaderboard() {
+            // This would typically fetch real data from a server
+            // For now, we'll use static data with some dynamic elements
+        }
+
+        // Initialize the app
+        updateLeaderboard();
+        setInterval(updateLeaderboard, 30000); // Update every 30 seconds
+    </script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/vcd15cbe7772f49c399c6a5babf22c1241717689176015" integrity="sha512-ZpsOmlRQV6y907TI0dKBHq9Md29nnaEIPlkf84rnaERnq6zvWvPUqr2ft8M1aS28oN72PdrCzSjY4U6VaAw1EQ==" data-cf-beacon='{"rayId":"97b8f40519f5556e","serverTiming":{"name":{"cfExtPri":true,"cfEdge":true,"cfOrigin":true,"cfL4":true,"cfSpeedBrain":true,"cfCacheStatus":true}},"version":"2025.8.0","token":"4edd5f8ec12a48cfa682ab8261b80a79"}' crossorigin="anonymous"></script>
+</body>
+</html>
+    <script id="html_badge_script1">
+        window.__genspark_remove_badge_link = "https://www.genspark.ai/api/html_badge/" +
+            "remove_badge?token=To%2FBnjzloZ3UfQdcSaYfDky5q5b3gTTHG0J6jbMjudWshg863dEZ2kzO7%2BS9H5cmdT%2Bq%2FodRcvf9xIWcUnewvI%2FtRV9cwBt%2BfnCAnz%2BKhUZNMl0nE18keRbp8jczls9qTJkssVNTDUsdBpy1u1yEVCndbBpRVhVzor9EZoNhNN8b0Ynz2n7wRe3ZQ%2F9VxHDnVjq6idj9UCf68ALtBVElGqbd3LwAKc29B%2FlBAKyVNHAx6sutN3zCVZZcrvtWplE01z1MJjpYK05a02tUok5SU796lEjD92VXnFUzmAbHc%2B0qdo3tz6sll8%2BXAbTS3KEAGKxAYNAbe%2BU0NlLEr51X7vX21zMDfQjPHuUkPJvK26z1K8Cd0qBkmwoRnKxoysjsYL1TuG6qf0H8g%2BMt8V7PM%2FMK4hKk%2FWa5OjWpUPCQjRlewAiN8c8aZtMhVrDJJ7rz6e7xZZGz%2FoLNqJZDWxM2uNTBFYr31YMq7iBuMfvBKKbIIUnk5h29KQEb1%2BCS%2FBcUuF4Bg1fk0Xkjy1lYZ72%2BTw%3D%3D";
+        window.__genspark_locale = "en-US";
+        window.__genspark_token = "To/BnjzloZ3UfQdcSaYfDky5q5b3gTTHG0J6jbMjudWshg863dEZ2kzO7+S9H5cmdT+q/odRcvf9xIWcUnewvI/tRV9cwBt+fnCAnz+KhUZNMl0nE18keRbp8jczls9qTJkssVNTDUsdBpy1u1yEVCndbBpRVhVzor9EZoNhNN8b0Ynz2n7wRe3ZQ/9VxHDnVjq6idj9UCf68ALtBVElGqbd3LwAKc29B/lBAKyVNHAx6sutN3zCVZZcrvtWplE01z1MJjpYK05a02tUok5SU796lEjD92VXnFUzmAbHc+0qdo3tz6sll8+XAbTS3KEAGKxAYNAbe+U0NlLEr51X7vX21zMDfQjPHuUkPJvK26z1K8Cd0qBkmwoRnKxoysjsYL1TuG6qf0H8g+Mt8V7PM/MK4hKk/Wa5OjWpUPCQjRlewAiN8c8aZtMhVrDJJ7rz6e7xZZGz/oLNqJZDWxM2uNTBFYr31YMq7iBuMfvBKKbIIUnk5h29KQEb1+CS/BcUuF4Bg1fk0Xkjy1lYZ72+Tw==";
+    </script>
+    
+    <script id="html_notice_dialog_script" src="https://www.genspark.ai/notice_dialog.js"></script>
+    
