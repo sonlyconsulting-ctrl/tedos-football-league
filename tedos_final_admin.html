@@ -1,0 +1,2390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tedo's Football Lounge - Smoove Spots Fantasy Platform</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary-color: #2D5A5A;
+            --accent-color: #FFD700;
+            --secondary-color: #1a365d;
+            --success-color: #10B981;
+            --error-color: #EF4444;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--primary-color) 0%, #1a4747 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: white;
+            min-height: 100vh;
+        }
+        
+        .accent-bg { background-color: var(--accent-color); }
+        .accent-text { color: var(--accent-color); }
+        .primary-bg { background-color: var(--primary-color); }
+        .secondary-bg { background-color: var(--secondary-color); }
+        
+        .nav-tab {
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+        }
+        
+        .nav-tab:hover, .nav-tab.active {
+            background: var(--accent-color);
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+        
+        .game-card {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            border-radius: 0.75rem;
+            padding: 1rem;
+            margin: 0.5rem 0;
+            transition: all 0.3s ease;
+        }
+        
+        .game-card:hover {
+            border-color: var(--accent-color);
+            box-shadow: 0 4px 20px rgba(255, 215, 0, 0.2);
+        }
+        
+        .team-btn {
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            border: 2px solid transparent;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .team-btn:hover {
+            border-color: var(--accent-color);
+            background: rgba(255, 215, 0, 0.1);
+        }
+        
+        .team-btn.selected {
+            background: var(--accent-color);
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+        
+        .status-final { color: #EF4444; }
+        .status-live { color: #F59E0B; }
+        .status-upcoming { color: #10B981; }
+        
+        .dropdown-custom {
+            background-color: var(--secondary-color);
+            color: var(--accent-color);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            border-radius: 0.5rem;
+            padding: 0.5rem 1rem;
+        }
+        
+        .dropdown-custom option {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+        
+        .avatar-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--accent-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-color);
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        
+        .admin-badge {
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            color: var(--primary-color);
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
+            font-weight: bold;
+            margin-left: 0.5rem;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+        }
+        
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background: var(--primary-color);
+            border-radius: 1rem;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .btn-primary {
+            background: var(--accent-color);
+            color: var(--primary-color);
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            color: var(--accent-color);
+            padding: 0.75rem 1.5rem;
+            border: 2px solid var(--accent-color);
+            border-radius: 0.5rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-secondary:hover {
+            background: var(--accent-color);
+            color: var(--primary-color);
+        }
+        
+        .form-input {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            border-radius: 0.5rem;
+            padding: 0.75rem 1rem;
+            color: white;
+            width: 100%;
+            margin-bottom: 1rem;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 2px rgba(255, 215, 0, 0.2);
+        }
+        
+        .form-input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        @media (max-width: 768px) {
+            .nav-tab {
+                padding: 0.5rem 1rem;
+                font-size: 0.875rem;
+            }
+            
+            .game-card {
+                padding: 0.75rem;
+            }
+            
+            .team-btn {
+                padding: 0.4rem 0.8rem;
+                font-size: 0.875rem;
+            }
+        }
+        
+        .hidden { display: none !important; }
+        .pulse { animation: pulse 2s infinite; }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            color: white;
+            z-index: 2000;
+            max-width: 300px;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.3s ease;
+        }
+        
+        .notification.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        
+        .notification.success { background: var(--success-color); }
+        .notification.error { background: var(--error-color); }
+        .notification.info { background: var(--secondary-color); }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <!-- Header -->
+        <header class="primary-bg shadow-lg">
+            <div class="container mx-auto px-4">
+                <div class="flex items-center justify-between py-4">
+                    <!-- Logo -->
+                    <div class="flex items-center space-x-3">
+                        <div class="w-12 h-12 accent-bg rounded-lg flex items-center justify-center font-bold text-xl" style="color: var(--primary-color);">
+                            TSL
+                        </div>
+                        <div>
+                            <h1 class="text-xl font-bold accent-text">Tedo's Sports Lounge</h1>
+                            <p class="text-sm opacity-75">Smoove Spots NFL & NCAA Football</p>
+                        </div>
+                    </div>
+                    
+                    <!-- User Info & Auth -->
+                    <div class="flex items-center space-x-4">
+                        <div id="userInfo" class="hidden flex items-center space-x-3">
+                            <div id="userAvatar" class="avatar-circle">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div class="hidden md:block">
+                                <div class="flex items-center">
+                                    <span id="userDisplayName" class="font-medium">Welcome</span>
+                                    <span id="adminBadge" class="admin-badge hidden">ADMIN</span>
+                                </div>
+                                <div class="flex items-center space-x-2 text-sm">
+                                    <i class="fas fa-coins accent-text"></i>
+                                    <span id="userCoins" class="accent-text font-bold">0</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div id="authButtons" class="flex space-x-2">
+                            <button id="loginBtn" class="btn-secondary text-sm">Login</button>
+                            <button id="signupBtn" class="btn-primary text-sm">Sign Up</button>
+                        </div>
+                        
+                        <button id="logoutBtn" class="hidden btn-secondary text-sm">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Navigation -->
+                <nav class="pb-4">
+                    <div class="flex flex-wrap justify-center space-x-1 md:space-x-4">
+                        <div class="nav-tab active" data-tab="lounge">
+                            <i class="fas fa-home mr-2"></i>Lounge
+                        </div>
+                        <div class="nav-tab" data-tab="nfl-picks">
+                            <i class="fas fa-football-ball mr-2"></i>Picks • NFL
+                        </div>
+                        <div class="nav-tab" data-tab="ncaa-picks">
+                            <i class="fas fa-graduation-cap mr-2"></i>Picks • NCAA
+                        </div>
+                        <div class="nav-tab" data-tab="leaderboards">
+                            <i class="fas fa-trophy mr-2"></i>Leaderboards
+                        </div>
+                        <div class="nav-tab" data-tab="profile">
+                            <i class="fas fa-user-circle mr-2"></i>Profile
+                        </div>
+                        <div class="nav-tab" data-tab="feedback">
+                            <i class="fas fa-comment-alt mr-2"></i>Tester Feedback
+                        </div>
+                    </div>
+                </nav>
+            </div>
+        </header>
+        
+        <!-- Main Content -->
+        <main class="container mx-auto px-4 py-8">
+            <!-- Lounge Section -->
+            <section id="loungeSection" class="tab-content">
+                <div class="text-center mb-8">
+                    <h1 class="text-4xl font-bold accent-text mb-4">Welcome to Tedo's Sports Lounge</h1>
+                    <p class="text-xl opacity-90 mb-6">The Ultimate Fantasy Football Experience with Smoove Coins</p>
+                    
+                    <!-- New User Instructions -->
+                    <div id="newUserInstructions" class="hidden secondary-bg rounded-lg p-6 mb-6 border border-yellow-500">
+                        <h3 class="text-xl font-bold accent-text mb-3">🏈 New to the Platform?</h3>
+                        <p class="mb-3">Get started in 3 easy steps:</p>
+                        <div class="flex flex-col md:flex-row justify-center space-y-2 md:space-y-0 md:space-x-4 text-sm">
+                            <div class="flex items-center">
+                                <span class="accent-bg text-black font-bold rounded-full w-6 h-6 flex items-center justify-center mr-2">1</span>
+                                👤 Go to Profile → Complete your setup
+                            </div>
+                            <div class="flex items-center">
+                                <span class="accent-bg text-black font-bold rounded-full w-6 h-6 flex items-center justify-center mr-2">2</span>
+                                📷 Upload your avatar & set display name
+                            </div>
+                            <div class="flex items-center">
+                                <span class="accent-bg text-black font-bold rounded-full w-6 h-6 flex items-center justify-center mr-2">3</span>
+                                🏈 Start making your NFL picks!
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- This Week's Vibe -->
+                    <div class="game-card">
+                        <h3 class="text-xl font-bold accent-text mb-4">This Week's Vibe</h3>
+                        <div class="space-y-4">
+                            <div class="flex justify-center space-x-4">
+                                <div class="text-center">
+                                    <div class="w-16 h-20 bg-gray-300 rounded flex items-center justify-center text-black font-bold">2</div>
+                                    <p class="text-sm mt-1">Jane Smith<br>9 pts</p>
+                                </div>
+                                <div class="text-center">
+                                    <div class="w-16 h-20 accent-bg rounded flex items-center justify-center text-black font-bold">1</div>
+                                    <p class="text-sm mt-1">John Doe<br>14 pts</p>
+                                </div>
+                                <div class="text-center">
+                                    <div class="w-16 h-20 bg-yellow-600 rounded flex items-center justify-center text-black font-bold">3</div>
+                                    <p class="text-sm mt-1">Guest User<br>3 pts</p>
+                                </div>
+                            </div>
+                            <div class="secondary-bg rounded p-3">
+                                <p class="text-sm"><strong>Your Progress:</strong></p>
+                                <div class="accent-bg h-2 rounded mt-1" style="width: 60%"></div>
+                                <p class="text-xs mt-1 accent-text">3 correct / 5 picks - Rank: 3</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Weekly Highlights -->
+                    <div class="game-card">
+                        <h3 class="text-xl font-bold accent-text mb-4">The Vibe Is Back!</h3>
+                        <p class="text-sm mb-4">Alright, alright—strap up. The season's humming and the rhythm is ruthless. Pads pop, crowds roar, and the field's a stage for cold-blooded brilliance. We talkin' trenches rumbling, sideline swagger, and underdogs kickin' down prime-time doors. New week, new legend—lock your pick, talk your talk, and let the scoreboard sing.</p>
+                        <div class="flex space-x-2 mt-4">
+                            <button class="btn-primary text-sm">Make Your Picks</button>
+                            <button class="btn-secondary text-sm">Give Feedback</button>
+                        </div>
+                    </div>
+                    
+                    <!-- YouTube Videos -->
+                    <div class="game-card">
+                        <h3 class="text-xl font-bold accent-text mb-4">Latest Podcast</h3>
+                        <div class="bg-black rounded-lg overflow-hidden mb-4">
+                            <div class="aspect-video bg-gray-800 flex items-center justify-center">
+                                <div class="text-center">
+                                    <i class="fas fa-play-circle text-4xl accent-text mb-2"></i>
+                                    <p class="text-sm">Smoove Spots Football Highlights</p>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="btn-primary w-full text-sm">Watch on YouTube</button>
+                    </div>
+                </div>
+                
+                <!-- Quick Stats -->
+                <div class="mt-8 grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="text-center secondary-bg rounded-lg p-4">
+                        <div class="text-2xl font-bold accent-text">47</div>
+                        <div class="text-sm">Active Players</div>
+                    </div>
+                    <div class="text-center secondary-bg rounded-lg p-4">
+                        <div class="text-2xl font-bold accent-text">1,234</div>
+                        <div class="text-sm">Total Picks</div>
+                    </div>
+                    <div class="text-center secondary-bg rounded-lg p-4">
+                        <div class="text-2xl font-bold accent-text">15,670</div>
+                        <div class="text-sm">Smoove Coins</div>
+                    </div>
+                    <div class="text-center secondary-bg rounded-lg p-4">
+                        <div class="text-2xl font-bold accent-text">$95.88</div>
+                        <div class="text-sm">Premium Revenue</div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- NFL Picks Section -->
+            <section id="nflPicksSection" class="tab-content hidden">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-3xl font-bold accent-text">NFL Picks</h2>
+                    <div class="flex items-center space-x-4">
+                        <select id="weekSelector" class="dropdown-custom">
+                            <option value="1">Week 1</option>
+                            <option value="2">Week 2</option>
+                            <option value="3">Week 3</option>
+                            <option value="4">Week 4</option>
+                            <option value="5">Week 5</option>
+                            <option value="6">Week 6</option>
+                            <option value="7">Week 7</option>
+                            <option value="8">Week 8</option>
+                            <option value="9">Week 9</option>
+                            <option value="10">Week 10</option>
+                            <option value="11">Week 11</option>
+                            <option value="12">Week 12</option>
+                            <option value="13">Week 13</option>
+                            <option value="14">Week 14</option>
+                            <option value="15">Week 15</option>
+                            <option value="16">Week 16</option>
+                            <option value="17">Week 17</option>
+                            <option value="18">Week 18</option>
+                            <option value="19">Wild Card</option>
+                            <option value="20">Divisional</option>
+                            <option value="21">Conference</option>
+                            <option value="22">Super Bowl</option>
+                        </select>
+                        <button id="submitPicksBtn" class="btn-primary">Submit Picks</button>
+                    </div>
+                </div>
+                
+                <div id="requireAuth" class="text-center py-12">
+                    <i class="fas fa-lock text-6xl accent-text mb-4"></i>
+                    <h3 class="text-2xl font-bold mb-4">Login Required</h3>
+                    <p class="text-lg mb-6">Please sign up or log in to make your NFL picks and earn Smoove Coins!</p>
+                    <div class="space-x-4">
+                        <button class="btn-primary" onclick="showAuthModal('signup')">Sign Up Free</button>
+                        <button class="btn-secondary" onclick="showAuthModal('login')">Login</button>
+                    </div>
+                </div>
+                
+                <div id="gamesContainer" class="hidden">
+                    <!-- Games will be populated here -->
+                </div>
+            </section>
+            
+            <!-- NCAA Picks Section -->
+            <section id="ncaaPicksSection" class="tab-content hidden">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-3xl font-bold accent-text">NCAA Picks</h2>
+                    <div class="bg-yellow-500 text-black px-3 py-1 rounded font-bold text-sm">
+                        PREMIUM FEATURE
+                    </div>
+                </div>
+                
+                <div id="ncaaRequireAuth" class="text-center py-12">
+                    <i class="fas fa-graduation-cap text-6xl accent-text mb-4"></i>
+                    <h3 class="text-2xl font-bold mb-4">Premium Feature</h3>
+                    <p class="text-lg mb-6">Upgrade to Lounge Pass to access NCAA picks for USC, Purdue, Notre Dame, Georgia, and Miami!</p>
+                    <button class="btn-primary" onclick="upgradeToPremium()">Upgrade to Lounge Pass - $7.99/month</button>
+                </div>
+                
+                <div id="ncaaGamesContainer" class="hidden">
+                    <div class="grid gap-4">
+                        <div class="game-card">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-sm opacity-75">Saturday 3:30 PM ET</span>
+                                <span class="status-upcoming">UPCOMING</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <button class="team-btn" data-team="USC">USC Trojans</button>
+                                <span class="text-lg font-bold">VS</span>
+                                <button class="team-btn" data-team="Stanford">Stanford Cardinal</button>
+                            </div>
+                        </div>
+                        
+                        <div class="game-card">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-sm opacity-75">Saturday 7:00 PM ET</span>
+                                <span class="status-upcoming">UPCOMING</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <button class="team-btn" data-team="Notre Dame">Notre Dame Fighting Irish</button>
+                                <span class="text-lg font-bold">VS</span>
+                                <button class="team-btn" data-team="Navy">Navy Midshipmen</button>
+                            </div>
+                        </div>
+                        
+                        <div class="game-card">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-sm opacity-75">Saturday 8:00 PM ET</span>
+                                <span class="status-upcoming">UPCOMING</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <button class="team-btn" data-team="Georgia">Georgia Bulldogs</button>
+                                <span class="text-lg font-bold">VS</span>
+                                <button class="team-btn" data-team="Kentucky">Kentucky Wildcats</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Leaderboards Section -->
+            <section id="leaderboardsSection" class="tab-content hidden">
+                <h2 class="text-3xl font-bold accent-text mb-6">Leaderboards</h2>
+                
+                <div class="grid md:grid-cols-2 gap-6">
+                    <!-- Weekly Leaderboard -->
+                    <div class="game-card">
+                        <h3 class="text-xl font-bold accent-text mb-4">🏆 Week 2 Leaderboard</h3>
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center p-3 secondary-bg rounded">
+                                <div class="flex items-center space-x-3">
+                                    <span class="accent-bg text-black font-bold w-8 h-8 rounded-full flex items-center justify-center">1</span>
+                                    <span class="font-medium">TedoMaster</span>
+                                </div>
+                                <div class="text-right">
+                                    <div class="font-bold accent-text">85 pts</div>
+                                    <div class="text-sm opacity-75">8/10 correct</div>
+                                </div>
+                            </div>
+                            
+                            <div class="flex justify-between items-center p-3 secondary-bg rounded">
+                                <div class="flex items-center space-x-3">
+                                    <span class="bg-gray-400 text-black font-bold w-8 h-8 rounded-full flex items-center justify-center">2</span>
+                                    <span class="font-medium">GridironGuru</span>
+                                </div>
+                                <div class="text-right">
+                                    <div class="font-bold accent-text">75 pts</div>
+                                    <div class="text-sm opacity-75">7/9 correct</div>
+                                </div>
+                            </div>
+                            
+                            <div class="flex justify-between items-center p-3 secondary-bg rounded">
+                                <div class="flex items-center space-x-3">
+                                    <span class="bg-yellow-600 text-black font-bold w-8 h-8 rounded-full flex items-center justify-center">3</span>
+                                    <span class="font-medium">SmooveSpots</span>
+                                </div>
+                                <div class="text-right">
+                                    <div class="font-bold accent-text">70 pts</div>
+                                    <div class="text-sm opacity-75">6/8 correct</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Season Standings -->
+                    <div class="game-card">
+                        <h3 class="text-xl font-bold accent-text mb-4">📊 Season Standings</h3>
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center p-3 secondary-bg rounded">
+                                <div class="flex items-center space-x-3">
+                                    <span class="font-bold">1.</span>
+                                    <span class="font-medium">TouchdownTim</span>
+                                </div>
+                                <div class="text-right">
+                                    <div class="font-bold accent-text">156 pts</div>
+                                    <div class="text-sm opacity-75">15/18 correct</div>
+                                </div>
+                            </div>
+                            
+                            <div class="flex justify-between items-center p-3 secondary-bg rounded">
+                                <div class="flex items-center space-x-3">
+                                    <span class="font-bold">2.</span>
+                                    <span class="font-medium">PickMaster</span>
+                                </div>
+                                <div class="text-right">
+                                    <div class="font-bold accent-text">143 pts</div>
+                                    <div class="text-sm opacity-75">14/19 correct</div>
+                                </div>
+                            </div>
+                            
+                            <div class="flex justify-between items-center p-3 secondary-bg rounded">
+                                <div class="flex items-center space-x-3">
+                                    <span class="font-bold">3.</span>
+                                    <span class="font-medium">FootballFanatic</span>
+                                </div>
+                                <div class="text-right">
+                                    <div class="font-bold accent-text">138 pts</div>
+                                    <div class="text-sm opacity-75">13/17 correct</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Share Achievement -->
+                <div class="mt-6 text-center">
+                    <button class="btn-secondary mr-4">
+                        <i class="fas fa-share mr-2"></i>Share My Stats
+                    </button>
+                    <button class="btn-primary">
+                        <i class="fas fa-trophy mr-2"></i>View Full Rankings
+                    </button>
+                </div>
+            </section>
+            
+            <!-- Profile Section -->
+            <section id="profileSection" class="tab-content hidden">
+                <h2 class="text-3xl font-bold accent-text mb-6">Profile Settings</h2>
+                
+                <div class="grid md:grid-cols-2 gap-6">
+                    <!-- Account Settings -->
+                    <div class="game-card">
+                        <h3 class="text-xl font-bold accent-text mb-4">Account Settings</h3>
+                        <div class="space-y-4">
+                            <!-- Avatar Upload -->
+                            <div>
+                                <label class="block text-sm font-medium mb-2">Profile Picture</label>
+                                <div class="flex items-center space-x-4">
+                                    <div id="profileAvatar" class="avatar-circle" style="width: 60px; height: 60px; font-size: 1.5rem;">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                    <div>
+                                        <input type="file" id="avatarUpload" accept="image/*" class="hidden">
+                                        <button onclick="document.getElementById('avatarUpload').click()" class="btn-secondary text-sm">
+                                            Change Avatar
+                                        </button>
+                                        <p class="text-xs opacity-75 mt-1">JPG, PNG, GIF up to 2MB</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Display Name -->
+                            <div>
+                                <label class="block text-sm font-medium mb-2">Display Name</label>
+                                <input type="text" id="displayNameInput" class="form-input" placeholder="Enter display name">
+                            </div>
+                            
+                            <!-- Email (readonly) -->
+                            <div>
+                                <label class="block text-sm font-medium mb-2">Email</label>
+                                <input type="email" id="emailDisplay" class="form-input" readonly style="opacity: 0.7;">
+                            </div>
+                            
+                            <!-- Timezone -->
+                            <div>
+                                <label class="block text-sm font-medium mb-2">Timezone Preference</label>
+                                <select id="timezoneSelector" class="dropdown-custom w-full">
+                                    <option value="ET">Eastern Time (ET)</option>
+                                    <option value="CT">Central Time (CT)</option>
+                                    <option value="MT">Mountain Time (MT)</option>
+                                    <option value="PT">Pacific Time (PT)</option>
+                                </select>
+                            </div>
+                            
+                            <button id="saveProfileBtn" class="btn-primary w-full">Save Profile</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Membership & Coins -->
+                    <div class="game-card">
+                        <h3 class="text-xl font-bold accent-text mb-4">Membership Plan</h3>
+                        
+                        <div id="membershipStatus" class="mb-4 p-4 secondary-bg rounded">
+                            <div class="flex justify-between items-center">
+                                <span class="font-medium">Free Insider</span>
+                                <button id="upgradeBtn" class="btn-primary text-sm">Upgrade to Lounge Pass</button>
+                            </div>
+                            <p class="text-sm opacity-75 mt-1">Click to view tiers and benefits.</p>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <h4 class="font-bold accent-text mb-2">Smoove Coins</h4>
+                            <div class="text-3xl font-bold accent-text" id="profileCoins">100</div>
+                            <button class="btn-secondary text-sm mt-2">View Coin History</button>
+                        </div>
+                        
+                        <!-- Password Change -->
+                        <div class="mt-6">
+                            <h4 class="font-bold accent-text mb-2">Change Password</h4>
+                            <input type="password" id="currentPassword" class="form-input" placeholder="Current Password">
+                            <input type="password" id="newPassword" class="form-input" placeholder="New Password">
+                            <input type="password" id="confirmPassword" class="form-input" placeholder="Confirm New Password">
+                            <button id="changePasswordBtn" class="btn-primary w-full">Change Password</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Additional Links -->
+                <div class="grid md:grid-cols-3 gap-4 mt-6">
+                    <button id="membershipLink" class="game-card text-center p-4 hover:border-yellow-500 cursor-pointer">
+                        <i class="fas fa-star text-3xl accent-text mb-2"></i>
+                        <h4 class="font-bold">Membership</h4>
+                        <p class="text-sm opacity-75">Manage subscription & billing</p>
+                    </button>
+                    
+                    <button id="rulesLink" class="game-card text-center p-4 hover:border-yellow-500 cursor-pointer">
+                        <i class="fas fa-gavel text-3xl accent-text mb-2"></i>
+                        <h4 class="font-bold">Rules</h4>
+                        <p class="text-sm opacity-75">Contest rules & scoring</p>
+                    </button>
+                    
+                    <button id="investorLink" class="game-card text-center p-4 hover:border-yellow-500 cursor-pointer">
+                        <i class="fas fa-chart-line text-3xl accent-text mb-2"></i>
+                        <h4 class="font-bold">Investor Relations</h4>
+                        <p class="text-sm opacity-75">Access executive documents</p>
+                    </button>
+                </div>
+                
+                <!-- Admin Dashboard (Only for sonlyconsulting@gmail.com) -->
+                <div id="adminDashboardSection" class="hidden mt-8">
+                    <div class="border-t border-yellow-500 pt-6">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="text-2xl font-bold accent-text">
+                                <i class="fas fa-cog mr-2"></i>Admin Dashboard
+                            </h3>
+                            <div class="admin-badge">ADMINISTRATOR ACCESS</div>
+                        </div>
+                        
+                        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                            <div class="secondary-bg p-4 rounded-lg text-center">
+                                <div class="text-2xl font-bold accent-text" id="adminTotalUsers">47</div>
+                                <div class="text-sm">Total Users</div>
+                            </div>
+                            <div class="secondary-bg p-4 rounded-lg text-center">
+                                <div class="text-2xl font-bold accent-text" id="adminTotalPicks">1,234</div>
+                                <div class="text-sm">Total Picks</div>
+                            </div>
+                            <div class="secondary-bg p-4 rounded-lg text-center">
+                                <div class="text-2xl font-bold accent-text" id="adminPremiumUsers">12</div>
+                                <div class="text-sm">Premium Members</div>
+                            </div>
+                            <div class="secondary-bg p-4 rounded-lg text-center">
+                                <div class="text-2xl font-bold accent-text" id="adminRevenue">$95.88</div>
+                                <div class="text-sm">Revenue</div>
+                            </div>
+                        </div>
+                        
+                        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <button id="manageUsersBtn" class="game-card p-4 text-center">
+                                <i class="fas fa-users text-2xl accent-text mb-2"></i>
+                                <h4 class="font-bold">User Management</h4>
+                                <p class="text-sm opacity-75">View & manage all users</p>
+                            </button>
+                            
+                            <button id="viewFeedbackBtn" class="game-card p-4 text-center">
+                                <i class="fas fa-comments text-2xl accent-text mb-2"></i>
+                                <h4 class="font-bold">Feedback Center</h4>
+                                <p class="text-sm opacity-75">Review user feedback</p>
+                            </button>
+                            
+                            <button id="exportDataBtn" class="game-card p-4 text-center">
+                                <i class="fas fa-download text-2xl accent-text mb-2"></i>
+                                <h4 class="font-bold">Export Data</h4>
+                                <p class="text-sm opacity-75">Download reports & analytics</p>
+                            </button>
+                            
+                            <button id="platformStatsBtn" class="game-card p-4 text-center">
+                                <i class="fas fa-chart-bar text-2xl accent-text mb-2"></i>
+                                <h4 class="font-bold">Platform Analytics</h4>
+                                <p class="text-sm opacity-75">Detailed usage statistics</p>
+                            </button>
+                            
+                            <button id="gameManagementBtn" class="game-card p-4 text-center">
+                                <i class="fas fa-football-ball text-2xl accent-text mb-2"></i>
+                                <h4 class="font-bold">Game Management</h4>
+                                <p class="text-sm opacity-75">Update scores & statuses</p>
+                            </button>
+                            
+                            <button id="systemSettingsBtn" class="game-card p-4 text-center">
+                                <i class="fas fa-cogs text-2xl accent-text mb-2"></i>
+                                <h4 class="font-bold">System Settings</h4>
+                                <p class="text-sm opacity-75">Platform configuration</p>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Feedback Section -->
+            <section id="feedbackSection" class="tab-content hidden">
+                <h2 class="text-3xl font-bold accent-text mb-6">Tester Feedback</h2>
+                
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="game-card">
+                        <h3 class="text-xl font-bold accent-text mb-4">Submit Feedback</h3>
+                        <form id="feedbackForm" class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium mb-2">Feedback Category</label>
+                                <select id="feedbackCategory" class="dropdown-custom w-full" required>
+                                    <option value="">Select Category</option>
+                                    <option value="bug">Bug Report</option>
+                                    <option value="feature">Feature Request</option>
+                                    <option value="ui">User Experience</option>
+                                    <option value="general">General Feedback</option>
+                                    <option value="premium">Premium Features</option>
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium mb-2">Overall Rating</label>
+                                <div class="flex space-x-2" id="ratingStars">
+                                    <i class="fas fa-star text-2xl cursor-pointer" data-rating="1"></i>
+                                    <i class="fas fa-star text-2xl cursor-pointer" data-rating="2"></i>
+                                    <i class="fas fa-star text-2xl cursor-pointer" data-rating="3"></i>
+                                    <i class="fas fa-star text-2xl cursor-pointer" data-rating="4"></i>
+                                    <i class="fas fa-star text-2xl cursor-pointer" data-rating="5"></i>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium mb-2">Your Name</label>
+                                <input type="text" id="feedbackName" class="form-input" placeholder="Enter your name" required>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium mb-2">Email</label>
+                                <input type="email" id="feedbackEmail" class="form-input" placeholder="Enter your email" required>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium mb-2">Detailed Feedback</label>
+                                <textarea id="feedbackText" class="form-input h-32 resize-none" placeholder="Please describe your experience, suggestions, or issues..." required></textarea>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium mb-2">Device Information</label>
+                                <input type="text" id="deviceInfo" class="form-input" placeholder="e.g., iPhone 14, iOS 17.0, Safari" readonly>
+                            </div>
+                            
+                            <button type="submit" class="btn-primary w-full">
+                                <i class="fas fa-paper-plane mr-2"></i>Submit Feedback
+                            </button>
+                        </form>
+                    </div>
+                    
+                    <div class="game-card">
+                        <h3 class="text-xl font-bold accent-text mb-4">Feedback Guidelines</h3>
+                        <div class="space-y-4 text-sm">
+                            <div>
+                                <h4 class="font-bold text-green-400 mb-1">✅ What to Include:</h4>
+                                <ul class="list-disc list-inside opacity-75 space-y-1">
+                                    <li>Specific steps to reproduce issues</li>
+                                    <li>Screenshots or screen recordings</li>
+                                    <li>Device and browser information</li>
+                                    <li>Expected vs actual behavior</li>
+                                </ul>
+                            </div>
+                            
+                            <div>
+                                <h4 class="font-bold text-yellow-400 mb-1">💡 Feature Suggestions:</h4>
+                                <ul class="list-disc list-inside opacity-75 space-y-1">
+                                    <li>Describe the problem it solves</li>
+                                    <li>How would you use this feature?</li>
+                                    <li>Priority level (nice-to-have vs critical)</li>
+                                </ul>
+                            </div>
+                            
+                            <div>
+                                <h4 class="font-bold text-blue-400 mb-1">📧 Contact:</h4>
+                                <p class="opacity-75">Urgent issues? Email directly:</p>
+                                <a href="/cdn-cgi/l/email-protection#92e1fdfcfeebf1fdfce1e7fee6fbfcf5d2f5fff3fbfebcf1fdff" class="accent-text font-medium">
+                                    <span class="__cf_email__" data-cfemail="dcafb3b2b0a5bfb3b2afa9b0a8b5b2bb9cbbb1bdb5b0f2bfb3b1">[email&#160;protected]</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+        
+        <!-- Authentication Modal -->
+        <div id="authModal" class="modal">
+            <div class="modal-content">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 id="authTitle" class="text-2xl font-bold accent-text">Login</h2>
+                    <button onclick="closeAuthModal()" class="text-2xl opacity-75 hover:opacity-100">×</button>
+                </div>
+                
+                <form id="authForm" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Email</label>
+                        <input type="email" id="authEmail" class="form-input" required>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Password</label>
+                        <input type="password" id="authPassword" class="form-input" required>
+                    </div>
+                    
+                    <div id="confirmPasswordDiv" class="hidden">
+                        <label class="block text-sm font-medium mb-2">Confirm Password</label>
+                        <input type="password" id="authConfirmPassword" class="form-input">
+                    </div>
+                    
+                    <button type="submit" id="authSubmitBtn" class="btn-primary w-full">Login</button>
+                </form>
+                
+                <div class="text-center mt-4">
+                    <button id="authToggle" class="text-sm accent-text underline">
+                        Don't have an account? Sign up
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Confirmation Modal -->
+        <div id="confirmModal" class="modal">
+            <div class="modal-content">
+                <div class="text-center">
+                    <i class="fas fa-question-circle text-6xl accent-text mb-4"></i>
+                    <h2 class="text-2xl font-bold mb-4" id="confirmTitle">Confirm Action</h2>
+                    <p class="text-lg mb-6" id="confirmMessage">Are you sure you want to proceed?</p>
+                    <div class="space-x-4">
+                        <button id="confirmYes" class="btn-primary">Confirm</button>
+                        <button id="confirmNo" class="btn-secondary">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Admin Modals -->
+        <div id="adminModal" class="modal">
+            <div class="modal-content" style="max-width: 800px;">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 id="adminModalTitle" class="text-2xl font-bold accent-text">Admin Panel</h2>
+                    <button onclick="closeAdminModal()" class="text-2xl opacity-75 hover:opacity-100">×</button>
+                </div>
+                
+                <div id="adminModalContent">
+                    <!-- Admin content will be loaded here -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- Notification -->
+        <div id="notification" class="notification">
+            <div class="flex items-center">
+                <i id="notificationIcon" class="fas fa-info-circle mr-3"></i>
+                <span id="notificationMessage"></span>
+            </div>
+        </div>
+    </div>
+    
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+        // Application State
+        const AppState = {
+            currentUser: null,
+            currentTab: 'lounge',
+            currentWeek: 1,
+            isAuthMode: 'login',
+            userPicks: {},
+            nflSchedule: {},
+            feedback: [],
+            users: {},
+            adminData: {
+                totalUsers: 47,
+                totalPicks: 1234,
+                premiumUsers: 12,
+                revenue: 95.88
+            }
+        };
+        
+        // NFL Schedule Data (Sample - Week 1)
+        const NFL_SCHEDULE = {
+            1: [
+                {
+                    id: 'W1-GAME-1',
+                    homeTeam: 'Dallas Cowboys',
+                    awayTeam: 'Philadelphia Eagles',
+                    kickoff: '2025-09-04 20:20:00',
+                    status: 'FINAL',
+                    finalScore: 'Eagles 27 - Cowboys 20',
+                    homeUrl: 'https://www.dallascowboys.com',
+                    awayUrl: 'https://www.philadelphiaeagles.com'
+                },
+                {
+                    id: 'W1-GAME-2',
+                    homeTeam: 'Kansas City Chiefs',
+                    awayTeam: 'Los Angeles Chargers',
+                    kickoff: '2025-09-05 20:00:00',
+                    status: 'UPCOMING',
+                    finalScore: '',
+                    homeUrl: 'https://www.chiefs.com',
+                    awayUrl: 'https://www.chargers.com'
+                },
+                {
+                    id: 'W1-GAME-3',
+                    homeTeam: 'Las Vegas Raiders',
+                    awayTeam: 'New England Patriots',
+                    kickoff: '2025-09-07 13:00:00',
+                    status: 'LIVE',
+                    finalScore: 'Patriots 14 - Raiders 10 (Q3)',
+                    homeUrl: 'https://www.raiders.com',
+                    awayUrl: 'https://www.patriots.com'
+                },
+                {
+                    id: 'W1-GAME-4',
+                    homeTeam: 'Pittsburgh Steelers',
+                    awayTeam: 'New York Jets',
+                    kickoff: '2025-09-07 13:00:00',
+                    status: 'UPCOMING',
+                    finalScore: '',
+                    homeUrl: 'https://www.steelers.com',
+                    awayUrl: 'https://www.newyorkjets.com'
+                },
+                {
+                    id: 'W1-GAME-5',
+                    homeTeam: 'Miami Dolphins',
+                    awayTeam: 'Indianapolis Colts',
+                    kickoff: '2025-09-07 13:00:00',
+                    status: 'FINAL',
+                    finalScore: 'Colts 24 - Dolphins 17',
+                    homeUrl: 'https://www.miamidolphins.com',
+                    awayUrl: 'https://www.colts.com'
+                },
+                {
+                    id: 'W1-GAME-6',
+                    homeTeam: 'Arizona Cardinals',
+                    awayTeam: 'New Orleans Saints',
+                    kickoff: '2025-09-07 13:00:00',
+                    status: 'FINAL',
+                    finalScore: 'Saints 21 - Cardinals 14',
+                    homeUrl: 'https://www.azcardinals.com',
+                    awayUrl: 'https://www.neworleanssaints.com'
+                },
+                {
+                    id: 'W1-GAME-7',
+                    homeTeam: 'New York Giants',
+                    awayTeam: 'Washington Commanders',
+                    kickoff: '2025-09-07 13:00:00',
+                    status: 'UPCOMING',
+                    finalScore: '',
+                    homeUrl: 'https://www.giants.com',
+                    awayUrl: 'https://www.commanders.com'
+                },
+                {
+                    id: 'W1-GAME-8',
+                    homeTeam: 'Carolina Panthers',
+                    awayTeam: 'Jacksonville Jaguars',
+                    kickoff: '2025-09-07 13:00:00',
+                    status: 'UPCOMING',
+                    finalScore: '',
+                    homeUrl: 'https://www.panthers.com',
+                    awayUrl: 'https://www.jaguars.com'
+                },
+                {
+                    id: 'W1-GAME-9',
+                    homeTeam: 'Cincinnati Bengals',
+                    awayTeam: 'Cleveland Browns',
+                    kickoff: '2025-09-07 13:00:00',
+                    status: 'UPCOMING',
+                    finalScore: '',
+                    homeUrl: 'https://www.bengals.com',
+                    awayUrl: 'https://www.clevelandbrowns.com'
+                },
+                {
+                    id: 'W1-GAME-10',
+                    homeTeam: 'Tampa Bay Buccaneers',
+                    awayTeam: 'Atlanta Falcons',
+                    kickoff: '2025-09-07 13:00:00',
+                    status: 'UPCOMING',
+                    finalScore: '',
+                    homeUrl: 'https://www.buccaneers.com',
+                    awayUrl: 'https://www.atlantafalcons.com'
+                },
+                {
+                    id: 'W1-GAME-11',
+                    homeTeam: 'Tennessee Titans',
+                    awayTeam: 'Denver Broncos',
+                    kickoff: '2025-09-07 16:05:00',
+                    status: 'UPCOMING',
+                    finalScore: '',
+                    homeUrl: 'https://www.titansonline.com',
+                    awayUrl: 'https://www.denverbroncos.com'
+                },
+                {
+                    id: 'W1-GAME-12',
+                    homeTeam: 'San Francisco 49ers',
+                    awayTeam: 'Seattle Seahawks',
+                    kickoff: '2025-09-07 16:05:00',
+                    status: 'UPCOMING',
+                    finalScore: '',
+                    homeUrl: 'https://www.49ers.com',
+                    awayUrl: 'https://www.seahawks.com'
+                },
+                {
+                    id: 'W1-GAME-13',
+                    homeTeam: 'Detroit Lions',
+                    awayTeam: 'Green Bay Packers',
+                    kickoff: '2025-09-07 16:25:00',
+                    status: 'UPCOMING',
+                    finalScore: '',
+                    homeUrl: 'https://www.detroitlions.com',
+                    awayUrl: 'https://www.packers.com'
+                },
+                {
+                    id: 'W1-GAME-14',
+                    homeTeam: 'Houston Texans',
+                    awayTeam: 'Los Angeles Rams',
+                    kickoff: '2025-09-07 16:25:00',
+                    status: 'UPCOMING',
+                    finalScore: '',
+                    homeUrl: 'https://www.houstontexans.com',
+                    awayUrl: 'https://www.therams.com'
+                },
+                {
+                    id: 'W1-GAME-15',
+                    homeTeam: 'Baltimore Ravens',
+                    awayTeam: 'Buffalo Bills',
+                    kickoff: '2025-09-07 20:20:00',
+                    status: 'UPCOMING',
+                    finalScore: '',
+                    homeUrl: 'https://www.baltimoreravens.com',
+                    awayUrl: 'https://www.buffalobills.com'
+                },
+                {
+                    id: 'W1-GAME-16',
+                    homeTeam: 'Minnesota Vikings',
+                    awayTeam: 'Chicago Bears',
+                    kickoff: '2025-09-08 20:15:00',
+                    status: 'UPCOMING',
+                    finalScore: '',
+                    homeUrl: 'https://www.vikings.com',
+                    awayUrl: 'https://www.chicagobears.com'
+                }
+            ]
+        };
+        
+        // Initialize App
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeApp();
+            loadStoredData();
+            setupEventListeners();
+            updateUI();
+        });
+        
+        function initializeApp() {
+            // Load data from cross-device storage simulation
+            const storedUser = getStoredData('currentUser');
+            if (storedUser) {
+                AppState.currentUser = storedUser;
+                updateAuthUI();
+                checkNewUserInstructions();
+            }
+            
+            // Initialize device info for feedback
+            const deviceInfo = `${navigator.platform}, ${navigator.userAgent.split('(')[1].split(')')[0]}`;
+            const deviceInput = document.getElementById('deviceInfo');
+            if (deviceInput) {
+                deviceInput.value = deviceInfo;
+            }
+            
+            // Load NFL schedule
+            AppState.nflSchedule = NFL_SCHEDULE;
+        }
+        
+        function loadStoredData() {
+            // Load user picks, feedback, etc.
+            AppState.userPicks = getStoredData('userPicks') || {};
+            AppState.feedback = getStoredData('feedback') || [];
+            AppState.users = getStoredData('users') || {};
+        }
+        
+        function setupEventListeners() {
+            // Navigation
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    switchTab(this.dataset.tab);
+                });
+            });
+            
+            // Auth buttons
+            document.getElementById('loginBtn')?.addEventListener('click', () => showAuthModal('login'));
+            document.getElementById('signupBtn')?.addEventListener('click', () => showAuthModal('signup'));
+            document.getElementById('logoutBtn')?.addEventListener('click', logout);
+            
+            // Auth form
+            document.getElementById('authForm')?.addEventListener('submit', handleAuthSubmit);
+            document.getElementById('authToggle')?.addEventListener('click', toggleAuthMode);
+            
+            // Week selector
+            document.getElementById('weekSelector')?.addEventListener('change', function() {
+                AppState.currentWeek = parseInt(this.value);
+                renderNFLGames();
+            });
+            
+            // Submit picks
+            document.getElementById('submitPicksBtn')?.addEventListener('click', submitPicks);
+            
+            // Profile management
+            document.getElementById('saveProfileBtn')?.addEventListener('click', saveProfile);
+            document.getElementById('changePasswordBtn')?.addEventListener('click', changePassword);
+            document.getElementById('upgradeBtn')?.addEventListener('click', upgradeToPremium);
+            
+            // Profile links
+            document.getElementById('membershipLink')?.addEventListener('click', () => showMembershipModal());
+            document.getElementById('rulesLink')?.addEventListener('click', () => showRulesModal());
+            document.getElementById('investorLink')?.addEventListener('click', () => showInvestorModal());
+            
+            // Admin functions
+            document.getElementById('manageUsersBtn')?.addEventListener('click', () => showAdminPanel('users'));
+            document.getElementById('viewFeedbackBtn')?.addEventListener('click', () => showAdminPanel('feedback'));
+            document.getElementById('exportDataBtn')?.addEventListener('click', () => showAdminPanel('export'));
+            document.getElementById('platformStatsBtn')?.addEventListener('click', () => showAdminPanel('stats'));
+            
+            // Feedback form
+            document.getElementById('feedbackForm')?.addEventListener('submit', submitFeedback);
+            setupRatingStars();
+            
+            // Avatar upload
+            document.getElementById('avatarUpload')?.addEventListener('change', handleAvatarUpload);
+            
+            // Modal close buttons
+            document.getElementById('confirmNo')?.addEventListener('click', closeConfirmModal);
+        }
+        
+        function switchTab(tabName) {
+            // Update active tab
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+            
+            // Hide all sections
+            document.querySelectorAll('.tab-content').forEach(section => {
+                section.classList.add('hidden');
+            });
+            
+            // Show selected section
+            const sectionMap = {
+                'lounge': 'loungeSection',
+                'nfl-picks': 'nflPicksSection',
+                'ncaa-picks': 'ncaaPicksSection',
+                'leaderboards': 'leaderboardsSection',
+                'profile': 'profileSection',
+                'feedback': 'feedbackSection'
+            };
+            
+            const sectionId = sectionMap[tabName];
+            if (sectionId) {
+                document.getElementById(sectionId).classList.remove('hidden');
+            }
+            
+            AppState.currentTab = tabName;
+            
+            // Initialize section-specific content
+            if (tabName === 'nfl-picks') {
+                initNFLPicks();
+            } else if (tabName === 'ncaa-picks') {
+                initNCAApicks();
+            } else if (tabName === 'profile') {
+                initProfile();
+            }
+        }
+        
+        function initNFLPicks() {
+            if (!AppState.currentUser) {
+                document.getElementById('requireAuth').classList.remove('hidden');
+                document.getElementById('gamesContainer').classList.add('hidden');
+            } else {
+                document.getElementById('requireAuth').classList.add('hidden');
+                document.getElementById('gamesContainer').classList.remove('hidden');
+                renderNFLGames();
+            }
+        }
+        
+        function renderNFLGames() {
+            const container = document.getElementById('gamesContainer');
+            const games = AppState.nflSchedule[AppState.currentWeek] || [];
+            
+            if (games.length === 0) {
+                container.innerHTML = '<div class="text-center py-8"><p class="text-lg">No games scheduled for this week.</p></div>';
+                return;
+            }
+            
+            container.innerHTML = games.map(game => {
+                const userPick = AppState.userPicks[game.id];
+                const canPick = game.status === 'UPCOMING';
+                
+                return `
+                    <div class="game-card">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-sm opacity-75">${formatGameTime(game.kickoff)}</span>
+                            <span class="status-${game.status.toLowerCase()}">${game.status}</span>
+                        </div>
+                        
+                        ${game.finalScore ? `
+                            <div class="text-center mb-2 text-sm font-bold accent-text">${game.finalScore}</div>
+                        ` : ''}
+                        
+                        <div class="flex justify-between items-center">
+                            <a href="${game.awayUrl}" target="_blank" class="team-btn ${userPick === game.awayTeam ? 'selected' : ''} ${!canPick ? 'opacity-50' : ''}" 
+                               ${canPick ? `onclick="selectTeam('${game.id}', '${game.awayTeam}', event)"` : ''}>
+                                ${game.awayTeam}
+                            </a>
+                            <span class="text-lg font-bold mx-4">@</span>
+                            <a href="${game.homeUrl}" target="_blank" class="team-btn ${userPick === game.homeTeam ? 'selected' : ''} ${!canPick ? 'opacity-50' : ''}" 
+                               ${canPick ? `onclick="selectTeam('${game.id}', '${game.homeTeam}', event)"` : ''}>
+                                ${game.homeTeam}
+                            </a>
+                        </div>
+                        
+                        ${!canPick && game.status !== 'FINAL' ? `
+                            <div class="text-center mt-2 text-sm opacity-75">
+                                <i class="fas fa-lock mr-1"></i>Picks locked - Game in progress
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function selectTeam(gameId, teamName, event) {
+            event.preventDefault();
+            
+            if (!AppState.currentUser) {
+                showNotification('Please log in to make picks', 'error');
+                return;
+            }
+            
+            // Update user picks
+            AppState.userPicks[gameId] = teamName;
+            storeData('userPicks', AppState.userPicks);
+            
+            // Re-render games to show selection
+            renderNFLGames();
+            
+            showNotification(`Selected ${teamName}`, 'success');
+        }
+        
+        function submitPicks() {
+            if (!AppState.currentUser) {
+                showNotification('Please log in to submit picks', 'error');
+                return;
+            }
+            
+            const games = AppState.nflSchedule[AppState.currentWeek] || [];
+            const upcomingGames = games.filter(g => g.status === 'UPCOMING');
+            const selectedPicks = upcomingGames.filter(g => AppState.userPicks[g.id]);
+            
+            if (selectedPicks.length === 0) {
+                showNotification('Please make at least one pick before submitting', 'error');
+                return;
+            }
+            
+            // Show confirmation dialog
+            showConfirmModal(
+                'Confirm Your Picks',
+                `Ready to submit your Week ${AppState.currentWeek} picks?\n\n✓ ${selectedPicks.length} games selected\n✓ Earn 5 coins per correct prediction\n✓ Can update until game starts`,
+                () => {
+                    // Confirmed - award coins and save
+                    const coinsEarned = selectedPicks.length * 5;
+                    AppState.currentUser.coins += coinsEarned;
+                    AppState.currentUser.picksSubmitted = true;
+                    
+                    // Store updated user data
+                    storeData('currentUser', AppState.currentUser);
+                    updateUserInStorage();
+                    
+                    showNotification(`Picks submitted! Earned ${coinsEarned} Smoove Coins! 🏈`, 'success');
+                    updateAuthUI();
+                }
+            );
+        }
+        
+        function initNCAAicks() {
+            if (!AppState.currentUser) {
+                document.getElementById('ncaaRequireAuth').classList.remove('hidden');
+                document.getElementById('ncaaGamesContainer').classList.add('hidden');
+            } else if (AppState.currentUser.isPremium) {
+                document.getElementById('ncaaRequireAuth').classList.add('hidden');
+                document.getElementById('ncaaGamesContainer').classList.remove('hidden');
+                setupNCAAGameHandlers();
+            } else {
+                document.getElementById('ncaaRequireAuth').classList.remove('hidden');
+                document.getElementById('ncaaGamesContainer').classList.add('hidden');
+            }
+        }
+        
+        function setupNCAAGameHandlers() {
+            document.querySelectorAll('#ncaaGamesContainer .team-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const gameCard = this.closest('.game-card');
+                    gameCard.querySelectorAll('.team-btn').forEach(b => b.classList.remove('selected'));
+                    this.classList.add('selected');
+                    
+                    showNotification(`Selected ${this.dataset.team}`, 'success');
+                });
+            });
+        }
+        
+        function initProfile() {
+            if (!AppState.currentUser) return;
+            
+            // Populate profile fields
+            document.getElementById('emailDisplay').value = AppState.currentUser.email;
+            document.getElementById('displayNameInput').value = AppState.currentUser.displayName || '';
+            document.getElementById('profileCoins').textContent = AppState.currentUser.coins || 0;
+            
+            // Update avatar
+            updateProfileAvatar();
+            
+            // Show admin dashboard if admin
+            if (isAdmin()) {
+                document.getElementById('adminDashboardSection').classList.remove('hidden');
+                document.getElementById('adminBadge').classList.remove('hidden');
+            } else {
+                document.getElementById('adminDashboardSection').classList.add('hidden');
+                document.getElementById('adminBadge').classList.add('hidden');
+            }
+        }
+        
+        function handleAvatarUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            // Validate file
+            if (file.size > 2 * 1024 * 1024) {
+                showNotification('File size must be less than 2MB', 'error');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                AppState.currentUser.avatar = e.target.result;
+                storeData('currentUser', AppState.currentUser);
+                updateUserInStorage();
+                updateProfileAvatar();
+                updateAuthUI();
+                showNotification('Avatar updated successfully!', 'success');
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        function updateProfileAvatar() {
+            const avatars = [
+                document.getElementById('profileAvatar'),
+                document.getElementById('userAvatar')
+            ];
+            
+            avatars.forEach(avatar => {
+                if (!avatar) return;
+                
+                if (AppState.currentUser?.avatar) {
+                    avatar.innerHTML = `<img src="${AppState.currentUser.avatar}" alt="Avatar" class="w-full h-full object-cover rounded-full">`;
+                } else if (AppState.currentUser?.displayName) {
+                    avatar.innerHTML = AppState.currentUser.displayName.charAt(0).toUpperCase();
+                } else {
+                    avatar.innerHTML = '<i class="fas fa-user"></i>';
+                }
+            });
+        }
+        
+        function saveProfile() {
+            if (!AppState.currentUser) return;
+            
+            const displayName = document.getElementById('displayNameInput').value.trim();
+            const timezone = document.getElementById('timezoneSelector').value;
+            
+            if (!displayName) {
+                showNotification('Display name is required', 'error');
+                return;
+            }
+            
+            AppState.currentUser.displayName = displayName;
+            AppState.currentUser.timezone = timezone;
+            
+            storeData('currentUser', AppState.currentUser);
+            updateUserInStorage();
+            updateAuthUI();
+            
+            showNotification('Profile saved successfully!', 'success');
+        }
+        
+        function changePassword() {
+            const current = document.getElementById('currentPassword').value;
+            const newPass = document.getElementById('newPassword').value;
+            const confirm = document.getElementById('confirmPassword').value;
+            
+            if (!current || !newPass || !confirm) {
+                showNotification('Please fill in all password fields', 'error');
+                return;
+            }
+            
+            if (current !== AppState.currentUser.password) {
+                showNotification('Current password is incorrect', 'error');
+                return;
+            }
+            
+            if (newPass !== confirm) {
+                showNotification('New passwords do not match', 'error');
+                return;
+            }
+            
+            if (newPass.length < 6) {
+                showNotification('Password must be at least 6 characters', 'error');
+                return;
+            }
+            
+            AppState.currentUser.password = newPass;
+            storeData('currentUser', AppState.currentUser);
+            updateUserInStorage();
+            
+            // Clear password fields
+            document.getElementById('currentPassword').value = '';
+            document.getElementById('newPassword').value = '';
+            document.getElementById('confirmPassword').value = '';
+            
+            showNotification('Password changed successfully!', 'success');
+        }
+        
+        function upgradeToPremium() {
+            if (!AppState.currentUser) {
+                showNotification('Please log in first', 'error');
+                return;
+            }
+            
+            // Immediately upgrade to premium for this release
+            AppState.currentUser.isPremium = true;
+            AppState.currentUser.membershipType = 'Lounge Pass';
+            AppState.currentUser.coins = Math.floor(AppState.currentUser.coins * 1.5); // Apply 1.5x bonus
+            
+            storeData('currentUser', AppState.currentUser);
+            updateUserInStorage();
+            
+            // Update UI
+            document.getElementById('membershipStatus').innerHTML = `
+                <div class="flex justify-between items-center">
+                    <div>
+                        <span class="font-medium accent-text">Lounge Pass Member</span>
+                        <div class="admin-badge text-xs">PREMIUM</div>
+                    </div>
+                    <span class="text-sm text-green-400">✓ Active</span>
+                </div>
+                <p class="text-sm opacity-75 mt-1">All premium features unlocked!</p>
+            `;
+            
+            showNotification('Welcome to Lounge Pass! 🎉\n✅ NCAA Picks Unlocked\n✅ Private Leagues Available\n✅ 1.5x Coin Bonus Active\n✅ Ad-Free Experience', 'success');
+            
+            // Update coins display
+            updateAuthUI();
+        }
+        
+        function showAuthModal(mode) {
+            AppState.isAuthMode = mode;
+            const modal = document.getElementById('authModal');
+            const title = document.getElementById('authTitle');
+            const submitBtn = document.getElementById('authSubmitBtn');
+            const toggle = document.getElementById('authToggle');
+            const confirmDiv = document.getElementById('confirmPasswordDiv');
+            
+            if (mode === 'login') {
+                title.textContent = 'Login';
+                submitBtn.textContent = 'Login';
+                toggle.textContent = "Don't have an account? Sign up";
+                confirmDiv.classList.add('hidden');
+            } else {
+                title.textContent = 'Sign Up';
+                submitBtn.textContent = 'Create Account';
+                toggle.textContent = 'Already have an account? Login';
+                confirmDiv.classList.remove('hidden');
+            }
+            
+            modal.classList.add('active');
+        }
+        
+        function closeAuthModal() {
+            document.getElementById('authModal').classList.remove('active');
+            document.getElementById('authForm').reset();
+        }
+        
+        function toggleAuthMode() {
+            const newMode = AppState.isAuthMode === 'login' ? 'signup' : 'login';
+            showAuthModal(newMode);
+        }
+        
+        function handleAuthSubmit(event) {
+            event.preventDefault();
+            
+            const email = document.getElementById('authEmail').value;
+            const password = document.getElementById('authPassword').value;
+            const confirmPassword = document.getElementById('authConfirmPassword').value;
+            
+            if (AppState.isAuthMode === 'signup') {
+                if (password !== confirmPassword) {
+                    showNotification('Passwords do not match', 'error');
+                    return;
+                }
+                
+                if (password.length < 6) {
+                    showNotification('Password must be at least 6 characters', 'error');
+                    return;
+                }
+                
+                // Create new user
+                const newUser = {
+                    email: email,
+                    password: password,
+                    displayName: email.split('@')[0],
+                    coins: 100,
+                    isPremium: false,
+                    membershipType: 'Free Insider',
+                    joinDate: new Date().toISOString(),
+                    avatar: null,
+                    timezone: 'ET'
+                };
+                
+                AppState.currentUser = newUser;
+                AppState.users[email] = newUser;
+                
+                storeData('currentUser', newUser);
+                storeData('users', AppState.users);
+                
+                closeAuthModal();
+                updateAuthUI();
+                checkNewUserInstructions();
+                
+                // Redirect to profile for setup
+                setTimeout(() => {
+                    switchTab('profile');
+                    showNotification('Welcome! Please complete your profile setup.', 'info');
+                }, 1000);
+                
+                showNotification('Account created successfully!', 'success');
+                
+            } else {
+                // Login
+                const storedUsers = getStoredData('users') || {};
+                const user = storedUsers[email];
+                
+                if (!user || user.password !== password) {
+                    showNotification('Invalid email or password', 'error');
+                    return;
+                }
+                
+                AppState.currentUser = user;
+                storeData('currentUser', user);
+                
+                closeAuthModal();
+                updateAuthUI();
+                checkNewUserInstructions();
+                
+                showNotification(`Welcome back, ${user.displayName}!`, 'success');
+            }
+        }
+        
+        function logout() {
+            AppState.currentUser = null;
+            storeData('currentUser', null);
+            updateAuthUI();
+            switchTab('lounge');
+            showNotification('Logged out successfully', 'info');
+        }
+        
+        function updateAuthUI() {
+            const userInfo = document.getElementById('userInfo');
+            const authButtons = document.getElementById('authButtons');
+            const logoutBtn = document.getElementById('logoutBtn');
+            const userDisplayName = document.getElementById('userDisplayName');
+            const userCoins = document.getElementById('userCoins');
+            
+            if (AppState.currentUser) {
+                userInfo.classList.remove('hidden');
+                authButtons.classList.add('hidden');
+                logoutBtn.classList.remove('hidden');
+                
+                userDisplayName.textContent = AppState.currentUser.displayName || AppState.currentUser.email;
+                userCoins.textContent = AppState.currentUser.coins || 0;
+                
+                updateProfileAvatar();
+                
+                // Show admin badge if admin
+                if (isAdmin()) {
+                    document.getElementById('adminBadge').classList.remove('hidden');
+                } else {
+                    document.getElementById('adminBadge').classList.add('hidden');
+                }
+            } else {
+                userInfo.classList.add('hidden');
+                authButtons.classList.remove('hidden');
+                logoutBtn.classList.add('hidden');
+            }
+        }
+        
+        function checkNewUserInstructions() {
+            const instructions = document.getElementById('newUserInstructions');
+            if (AppState.currentUser && (!AppState.currentUser.displayName || !AppState.currentUser.avatar)) {
+                instructions.classList.remove('hidden');
+            } else {
+                instructions.classList.add('hidden');
+            }
+        }
+        
+        function isAdmin() {
+            return AppState.currentUser && AppState.currentUser.email === 'sonlyconsulting@gmail.com';
+        }
+        
+        function showAdminPanel(type) {
+            if (!isAdmin()) {
+                showNotification('Access denied', 'error');
+                return;
+            }
+            
+            const modal = document.getElementById('adminModal');
+            const title = document.getElementById('adminModalTitle');
+            const content = document.getElementById('adminModalContent');
+            
+            switch (type) {
+                case 'users':
+                    title.textContent = 'User Management';
+                    content.innerHTML = renderUserManagement();
+                    break;
+                case 'feedback':
+                    title.textContent = 'Feedback Center';
+                    content.innerHTML = renderFeedbackManagement();
+                    break;
+                case 'export':
+                    title.textContent = 'Export Data';
+                    content.innerHTML = renderDataExport();
+                    break;
+                case 'stats':
+                    title.textContent = 'Platform Analytics';
+                    content.innerHTML = renderPlatformStats();
+                    break;
+            }
+            
+            modal.classList.add('active');
+        }
+        
+        function renderUserManagement() {
+            const users = Object.values(AppState.users);
+            
+            return `
+                <div class="space-y-4">
+                    <div class="flex justify-between items-center">
+                        <h3 class="text-lg font-bold">Registered Users (${users.length})</h3>
+                        <button onclick="exportUsers()" class="btn-primary text-sm">Export CSV</button>
+                    </div>
+                    
+                    <div class="max-h-96 overflow-y-auto">
+                        ${users.map(user => `
+                            <div class="secondary-bg p-3 rounded mb-2">
+                                <div class="flex justify-between items-center">
+                                    <div>
+                                        <div class="font-medium">${user.displayName}</div>
+                                        <div class="text-sm opacity-75">${user.email}</div>
+                                        <div class="text-sm accent-text">${user.coins} coins • ${user.membershipType}</div>
+                                    </div>
+                                    <div class="space-x-2">
+                                        <button onclick="resetUserPassword('${user.email}')" class="btn-secondary text-xs">Reset Password</button>
+                                        <button onclick="toggleUserPremium('${user.email}')" class="btn-primary text-xs">
+                                            ${user.isPremium ? 'Remove Premium' : 'Make Premium'}
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+        
+        function renderFeedbackManagement() {
+            return `
+                <div class="space-y-4">
+                    <div class="flex justify-between items-center">
+                        <h3 class="text-lg font-bold">Feedback Submissions (${AppState.feedback.length})</h3>
+                        <button onclick="exportFeedback()" class="btn-primary text-sm">Export CSV</button>
+                    </div>
+                    
+                    <div class="max-h-96 overflow-y-auto">
+                        ${AppState.feedback.map((feedback, index) => `
+                            <div class="secondary-bg p-3 rounded mb-2">
+                                <div class="flex justify-between items-start">
+                                    <div class="flex-1">
+                                        <div class="flex items-center space-x-2 mb-1">
+                                            <span class="font-medium">${feedback.name}</span>
+                                            <span class="text-xs accent-bg text-black px-2 py-1 rounded">${feedback.category}</span>
+                                            <span class="text-xs">${'★'.repeat(feedback.rating)}</span>
+                                        </div>
+                                        <div class="text-sm mb-2">${feedback.text}</div>
+                                        <div class="text-xs opacity-75">${feedback.email} • ${feedback.date}</div>
+                                    </div>
+                                    <button onclick="emailResponse('${feedback.email}')" class="btn-secondary text-xs">Reply</button>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+        
+        function renderDataExport() {
+            return `
+                <div class="space-y-4">
+                    <h3 class="text-lg font-bold">Export Platform Data</h3>
+                    
+                    <div class="grid grid-cols-2 gap-4">
+                        <button onclick="exportData('users')" class="secondary-bg p-4 rounded text-center hover:border-yellow-500 border border-transparent">
+                            <i class="fas fa-users text-2xl accent-text mb-2"></i>
+                            <div class="font-bold">User Data</div>
+                            <div class="text-sm opacity-75">${Object.keys(AppState.users).length} users</div>
+                        </button>
+                        
+                        <button onclick="exportData('picks')" class="secondary-bg p-4 rounded text-center hover:border-yellow-500 border border-transparent">
+                            <i class="fas fa-football-ball text-2xl accent-text mb-2"></i>
+                            <div class="font-bold">Picks Data</div>
+                            <div class="text-sm opacity-75">${Object.keys(AppState.userPicks).length} picks</div>
+                        </button>
+                        
+                        <button onclick="exportData('feedback')" class="secondary-bg p-4 rounded text-center hover:border-yellow-500 border border-transparent">
+                            <i class="fas fa-comments text-2xl accent-text mb-2"></i>
+                            <div class="font-bold">Feedback</div>
+                            <div class="text-sm opacity-75">${AppState.feedback.length} submissions</div>
+                        </button>
+                        
+                        <button onclick="exportData('all')" class="secondary-bg p-4 rounded text-center hover:border-yellow-500 border border-transparent">
+                            <i class="fas fa-database text-2xl accent-text mb-2"></i>
+                            <div class="font-bold">Complete Export</div>
+                            <div class="text-sm opacity-75">All platform data</div>
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function renderPlatformStats() {
+            return `
+                <div class="space-y-6">
+                    <h3 class="text-lg font-bold">Platform Analytics</h3>
+                    
+                    <!-- Chart Container -->
+                    <div class="secondary-bg p-4 rounded">
+                        <canvas id="analyticsChart" style="height: 300px;"></canvas>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="secondary-bg p-4 rounded">
+                            <h4 class="font-bold accent-text mb-2">User Stats</h4>
+                            <div class="space-y-1 text-sm">
+                                <div>Total Users: ${Object.keys(AppState.users).length}</div>
+                                <div>Premium Users: ${Object.values(AppState.users).filter(u => u.isPremium).length}</div>
+                                <div>Conversion Rate: ${((Object.values(AppState.users).filter(u => u.isPremium).length / Math.max(Object.keys(AppState.users).length, 1)) * 100).toFixed(1)}%</div>
+                            </div>
+                        </div>
+                        
+                        <div class="secondary-bg p-4 rounded">
+                            <h4 class="font-bold accent-text mb-2">Engagement</h4>
+                            <div class="space-y-1 text-sm">
+                                <div>Total Picks: ${Object.keys(AppState.userPicks).length}</div>
+                                <div>Feedback: ${AppState.feedback.length} submissions</div>
+                                <div>Avg Rating: ${AppState.feedback.length > 0 ? (AppState.feedback.reduce((sum, f) => sum + f.rating, 0) / AppState.feedback.length).toFixed(1) : 'N/A'}/5</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function closeAdminModal() {
+            document.getElementById('adminModal').classList.remove('active');
+        }
+        
+        function setupRatingStars() {
+            let selectedRating = 0;
+            
+            document.querySelectorAll('#ratingStars i').forEach(star => {
+                star.addEventListener('mouseenter', function() {
+                    const rating = parseInt(this.dataset.rating);
+                    updateStarDisplay(rating);
+                });
+                
+                star.addEventListener('mouseleave', function() {
+                    updateStarDisplay(selectedRating);
+                });
+                
+                star.addEventListener('click', function() {
+                    selectedRating = parseInt(this.dataset.rating);
+                    updateStarDisplay(selectedRating);
+                });
+            });
+            
+            function updateStarDisplay(rating) {
+                document.querySelectorAll('#ratingStars i').forEach((star, index) => {
+                    if (index < rating) {
+                        star.classList.add('accent-text');
+                        star.classList.remove('opacity-50');
+                    } else {
+                        star.classList.remove('accent-text');
+                        star.classList.add('opacity-50');
+                    }
+                });
+            }
+            
+            // Initialize with no rating
+            updateStarDisplay(0);
+        }
+        
+        function submitFeedback(event) {
+            event.preventDefault();
+            
+            const formData = {
+                category: document.getElementById('feedbackCategory').value,
+                rating: document.querySelectorAll('#ratingStars i.accent-text').length,
+                name: document.getElementById('feedbackName').value,
+                email: document.getElementById('feedbackEmail').value,
+                text: document.getElementById('feedbackText').value,
+                device: document.getElementById('deviceInfo').value,
+                date: new Date().toISOString(),
+                userId: AppState.currentUser?.email || 'anonymous'
+            };
+            
+            if (!formData.category || !formData.rating || !formData.name || !formData.email || !formData.text) {
+                showNotification('Please fill in all required fields', 'error');
+                return;
+            }
+            
+            // Store feedback
+            AppState.feedback.push(formData);
+            storeData('feedback', AppState.feedback);
+            
+            // Create email link
+            const subject = `Tedo's Football Lounge Feedback - ${formData.category}`;
+            const body = `
+User: ${formData.name} (${formData.email})
+Category: ${formData.category}
+Rating: ${formData.rating}/5 stars
+Date: ${new Date(formData.date).toLocaleString()}
+User ID: ${formData.userId}
+
+Feedback:
+${formData.text}
+
+Device: ${formData.device}
+            `.trim();
+            
+            const mailtoLink = `mailto:sonlyconsulting@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            
+            // Open email client
+            window.open(mailtoLink);
+            
+            // Reset form
+            document.getElementById('feedbackForm').reset();
+            setupRatingStars();
+            
+            showNotification('Feedback submitted and email opened! Thank you! 🙏', 'success');
+        }
+        
+        function showConfirmModal(title, message, onConfirm) {
+            document.getElementById('confirmTitle').textContent = title;
+            document.getElementById('confirmMessage').textContent = message;
+            
+            const yesBtn = document.getElementById('confirmYes');
+            const noBtn = document.getElementById('confirmNo');
+            
+            // Remove existing listeners
+            yesBtn.replaceWith(yesBtn.cloneNode(true));
+            const newYesBtn = document.getElementById('confirmYes');
+            
+            newYesBtn.addEventListener('click', function() {
+                closeConfirmModal();
+                onConfirm();
+            });
+            
+            document.getElementById('confirmModal').classList.add('active');
+        }
+        
+        function closeConfirmModal() {
+            document.getElementById('confirmModal').classList.remove('active');
+        }
+        
+        function showNotification(message, type = 'info') {
+            const notification = document.getElementById('notification');
+            const messageEl = document.getElementById('notificationMessage');
+            const iconEl = document.getElementById('notificationIcon');
+            
+            messageEl.textContent = message;
+            notification.className = `notification ${type}`;
+            
+            // Update icon based on type
+            const icons = {
+                success: 'fas fa-check-circle',
+                error: 'fas fa-exclamation-circle',
+                info: 'fas fa-info-circle'
+            };
+            iconEl.className = icons[type] || icons.info + ' mr-3';
+            
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 5000);
+        }
+        
+        // Storage functions - simulate cross-device persistence
+        function storeData(key, value) {
+            try {
+                localStorage.setItem(`tedos_${key}`, JSON.stringify(value));
+                // Simulate cloud sync
+                if (AppState.currentUser) {
+                    localStorage.setItem(`tedos_cloud_${AppState.currentUser.email}_${key}`, JSON.stringify(value));
+                }
+            } catch (error) {
+                console.warn('Storage error:', error);
+            }
+        }
+        
+        function getStoredData(key) {
+            try {
+                // Try cloud sync first if user is logged in
+                if (AppState.currentUser) {
+                    const cloudData = localStorage.getItem(`tedos_cloud_${AppState.currentUser.email}_${key}`);
+                    if (cloudData) {
+                        return JSON.parse(cloudData);
+                    }
+                }
+                
+                const localData = localStorage.getItem(`tedos_${key}`);
+                return localData ? JSON.parse(localData) : null;
+            } catch (error) {
+                console.warn('Storage retrieval error:', error);
+                return null;
+            }
+        }
+        
+        function updateUserInStorage() {
+            if (!AppState.currentUser) return;
+            
+            // Update user in users collection
+            AppState.users[AppState.currentUser.email] = AppState.currentUser;
+            storeData('users', AppState.users);
+        }
+        
+        function formatGameTime(kickoffTime) {
+            const date = new Date(kickoffTime);
+            const options = { 
+                weekday: 'short', 
+                month: 'short', 
+                day: 'numeric', 
+                hour: 'numeric', 
+                minute: '2-digit'
+            };
+            return date.toLocaleDateString('en-US', options);
+        }
+        
+        function updateUI() {
+            // Update any UI elements that need refreshing
+            if (AppState.currentTab === 'nfl-picks') {
+                renderNFLGames();
+            }
+        }
+        
+        // Admin functions
+        function exportUsers() {
+            exportData('users');
+        }
+        
+        function exportFeedback() {
+            exportData('feedback');
+        }
+        
+        function exportData(type) {
+            let data, filename;
+            
+            switch (type) {
+                case 'users':
+                    data = Object.values(AppState.users);
+                    filename = 'tedos_users.json';
+                    break;
+                case 'picks':
+                    data = AppState.userPicks;
+                    filename = 'tedos_picks.json';
+                    break;
+                case 'feedback':
+                    data = AppState.feedback;
+                    filename = 'tedos_feedback.json';
+                    break;
+                case 'all':
+                    data = {
+                        users: AppState.users,
+                        picks: AppState.userPicks,
+                        feedback: AppState.feedback,
+                        exportDate: new Date().toISOString()
+                    };
+                    filename = 'tedos_complete_export.json';
+                    break;
+            }
+            
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            showNotification(`${filename} downloaded successfully!`, 'success');
+        }
+        
+        function resetUserPassword(email) {
+            const user = AppState.users[email];
+            if (!user) return;
+            
+            const newPassword = 'TempPass123!';
+            user.password = newPassword;
+            
+            AppState.users[email] = user;
+            storeData('users', AppState.users);
+            
+            showNotification(`Password reset for ${email}. New password: ${newPassword}`, 'info');
+        }
+        
+        function toggleUserPremium(email) {
+            const user = AppState.users[email];
+            if (!user) return;
+            
+            user.isPremium = !user.isPremium;
+            user.membershipType = user.isPremium ? 'Lounge Pass' : 'Free Insider';
+            
+            AppState.users[email] = user;
+            storeData('users', AppState.users);
+            
+            showNotification(`${email} ${user.isPremium ? 'upgraded to' : 'downgraded from'} premium`, 'success');
+            
+            // Refresh admin panel
+            setTimeout(() => {
+                showAdminPanel('users');
+            }, 1000);
+        }
+        
+        function emailResponse(email) {
+            const subject = 'Re: Tedo\'s Football Lounge Feedback';
+            const body = 'Thank you for your feedback! We appreciate your input and will consider your suggestions.';
+            
+            const mailtoLink = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            window.open(mailtoLink);
+        }
+        
+        // Modal functions for profile links
+        function showMembershipModal() {
+            const modal = document.getElementById('adminModal');
+            const title = document.getElementById('adminModalTitle');
+            const content = document.getElementById('adminModalContent');
+            
+            title.textContent = 'Membership Plans';
+            content.innerHTML = `
+                <div class="space-y-6">
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div class="secondary-bg p-6 rounded-lg border border-gray-600">
+                            <h3 class="text-xl font-bold mb-4">Free Insider</h3>
+                            <div class="text-3xl font-bold accent-text mb-4">Free</div>
+                            <ul class="space-y-2 text-sm mb-6">
+                                <li>✅ Full NFL Picks & Leaderboards</li>
+                                <li>✅ AI Live Score Updates</li>
+                                <li>✅ Standard Smoove Coin Earning</li>
+                                <li>❌ NCAA Picks & Leaderboards</li>
+                                <li>❌ Create & Join Private Leagues</li>
+                            </ul>
+                            <div class="text-center">
+                                <span class="text-sm opacity-75">Your Current Plan</span>
+                            </div>
+                        </div>
+                        
+                        <div class="accent-bg p-6 rounded-lg border-2 border-yellow-400 text-black">
+                            <div class="flex justify-between items-start mb-4">
+                                <h3 class="text-xl font-bold">Lounge Pass</h3>
+                                <span class="bg-black text-yellow-400 px-2 py-1 rounded text-xs font-bold">BEST VALUE</span>
+                            </div>
+                            <div class="mb-4">
+                                <span class="text-3xl font-bold">$7.99</span>
+                                <span class="text-sm">/month</span>
+                            </div>
+                            <ul class="space-y-2 text-sm mb-6">
+                                <li>✅ Full NFL Picks & Leaderboards</li>
+                                <li>✅ AI Live Score Updates</li>
+                                <li>✅ 1.5x Smoove Coin Bonus</li>
+                                <li>✅ Full NCAA Picks & Leaderboards</li>
+                                <li>✅ Create & Join Private Leagues</li>
+                                <li>✅ 100% Ad-Free Experience</li>
+                            </ul>
+                            <button onclick="upgradeToPremium(); closeAdminModal();" class="w-full bg-black text-yellow-400 font-bold py-3 rounded">
+                                Upgrade Now (Test)
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            modal.classList.add('active');
+        }
+        
+        function showRulesModal() {
+            const modal = document.getElementById('adminModal');
+            const title = document.getElementById('adminModalTitle');
+            const content = document.getElementById('adminModalContent');
+            
+            title.textContent = 'Official Contest Rules';
+            content.innerHTML = `
+                <div class="space-y-4 text-sm max-h-96 overflow-y-auto">
+                    <h3 class="font-bold accent-text">1. Eligibility</h3>
+                    <p>The contest is open to legal residents of their respective countries, states, or provinces where such contests are allowed. Participants must be 18 years of age or older. Employees of Tedo's Sports Lounge are not eligible.</p>
+                    
+                    <h3 class="font-bold accent-text">2. How to Play</h3>
+                    <p>Each week, a set of NFL and NCAAF games will be available for picks. Users must select the team they believe will win against the spread for each game. All picks must be submitted before the official start time of each game.</p>
+                    
+                    <h3 class="font-bold accent-text">3. Scoring</h3>
+                    <p>For each correct pick, the user will be awarded 10 points. Incorrect picks result in 0 points. A 'push' (tie against the spread) results in 5 points. The leaderboard is updated in real-time as games conclude.</p>
+                    
+                    <h3 class="font-bold accent-text">4. Smoove Coins</h3>
+                    <p>Users earn 5 Smoove Coins for each correct pick, 25 bonus coins for a perfect week, and 10 coins for daily login. Premium members receive a 1.5x multiplier on all coin earnings.</p>
+                    
+                    <h3 class="font-bold accent-text">5. Prizes and Rewards</h3>
+                    <p>Smoove Coins can be redeemed in the Prize Shop for exclusive merchandise, profile badges, and special contest entries. Additional prizes may be awarded for weekly and seasonal leaderboard winners.</p>
+                </div>
+                
+                <div class="mt-6 text-center">
+                    <a href="mailto:sonlyconsulting@gmail.com?subject=Rules Question" class="btn-secondary text-sm">
+                        <i class="fas fa-envelope mr-2"></i>Contact for Questions
+                    </a>
+                </div>
+            `;
+            
+            modal.classList.add('active');
+        }
+        
+        function showInvestorModal() {
+            const modal = document.getElementById('adminModal');
+            const title = document.getElementById('adminModalTitle');
+            const content = document.getElementById('adminModalContent');
+            
+            title.textContent = 'Investor Relations';
+            content.innerHTML = `
+                <div class="space-y-6">
+                    <div class="text-center">
+                        <i class="fas fa-chart-line text-4xl accent-text mb-4"></i>
+                        <h3 class="text-xl font-bold mb-2">Executive Documents</h3>
+                        <p class="opacity-75 mb-6">Access company financial documents and investor materials.</p>
+                    </div>
+                    
+                    <div class="grid gap-4">
+                        <div class="secondary-bg p-4 rounded-lg flex justify-between items-center">
+                            <div>
+                                <h4 class="font-bold">Investor Packet Q3 2024</h4>
+                                <p class="text-sm opacity-75">Executive summary and financial projections</p>
+                            </div>
+                            <button onclick="openDocument('investor')" class="btn-primary text-sm">
+                                <i class="fas fa-download mr-2"></i>Download
+                            </button>
+                        </div>
+                        
+                        <div class="secondary-bg p-4 rounded-lg flex justify-between items-center">
+                            <div>
+                                <h4 class="font-bold">Smoove Coins Whitepaper</h4>
+                                <p class="text-sm opacity-75">Virtual currency economics and strategy</p>
+                            </div>
+                            <button onclick="openDocument('whitepaper')" class="btn-primary text-sm">
+                                <i class="fas fa-download mr-2"></i>Download
+                            </button>
+                        </div>
+                        
+                        <div class="secondary-bg p-4 rounded-lg flex justify-between items-center">
+                            <div>
+                                <h4 class="font-bold">Official Contest Rules</h4>
+                                <p class="text-sm opacity-75">Complete terms and conditions</p>
+                            </div>
+                            <button onclick="openDocument('rules')" class="btn-primary text-sm">
+                                <i class="fas fa-download mr-2"></i>Download
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center">
+                        <p class="text-sm opacity-75 mb-4">For additional investor inquiries:</p>
+                        <a href="mailto:sonlyconsulting@gmail.com?subject=Investor Inquiry" class="btn-secondary">
+                            <i class="fas fa-envelope mr-2"></i>Contact Investor Relations
+                        </a>
+                    </div>
+                </div>
+            `;
+            
+            modal.classList.add('active');
+        }
+        
+        function openDocument(type) {
+            // Simulate document opening in new window
+            let content, title;
+            
+            switch (type) {
+                case 'investor':
+                    title = 'Investor Packet Q3 2024';
+                    content = `
+                        <h1>Tedo's Sports Lounge - Investor Packet</h1>
+                        <h2>Executive Summary</h2>
+                        <p>Tedo's Sports Lounge is a premier online platform for sports enthusiasts to engage in picking games, compete on leaderboards, and be part of a vibrant community.</p>
+                        <h2>Market Opportunity</h2>
+                        <p>The sports betting and fantasy sports market is experiencing exponential growth. Our platform carves a unique niche by focusing on a user-friendly, community-driven experience.</p>
+                        <h2>Financial Projections</h2>
+                        <p>We project significant user growth and revenue streams through our tiered membership model and premium features.</p>
+                    `;
+                    break;
+                case 'whitepaper':
+                    title = 'Smoove Coins Whitepaper';
+                    content = `
+                        <h1>Smoove Coins Whitepaper</h1>
+                        <h2>What are Smoove Coins?</h2>
+                        <p>Smoove Coins are the official virtual currency of Tedo's Sports Lounge, designed to reward user engagement and skillful picking.</p>
+                        <h2>Earning Mechanisms</h2>
+                        <p>Users earn coins through correct predictions, daily engagement, and premium membership bonuses.</p>
+                        <h2>Economic Model</h2>
+                        <p>The coin system drives user retention and creates value for both free and premium members.</p>
+                    `;
+                    break;
+                case 'rules':
+                    title = 'Official Contest Rules';
+                    content = `
+                        <h1>Official Rules - Tedo's Sports Lounge</h1>
+                        <h2>Eligibility</h2>
+                        <p>Contest open to legal residents 18+ where permitted by law.</p>
+                        <h2>Gameplay</h2>
+                        <p>Select winning teams against the spread before game start times.</p>
+                        <h2>Scoring System</h2>
+                        <p>10 points for correct picks, 5 for pushes, 0 for incorrect.</p>
+                    `;
+                    break;
+            }
+            
+            const newWindow = window.open('', '_blank', 'width=800,height=600,scrollbars=yes,resizable=yes');
+            newWindow.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>${title}</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+                        h1 { color: #2D5A5A; }
+                        h2 { color: #FFD700; background: #2D5A5A; padding: 10px; }
+                        p { line-height: 1.6; }
+                    </style>
+                </head>
+                <body>
+                    ${content}
+                    <div style="margin-top: 40px; text-align: center; border-top: 1px solid #ccc; padding-top: 20px;">
+                        <button onclick="window.print()" style="margin-right: 10px; padding: 10px 20px; background: #FFD700; border: none; cursor: pointer;">Print</button>
+                        <button onclick="window.close()" style="padding: 10px 20px; background: #2D5A5A; color: white; border: none; cursor: pointer;">Close</button>
+                    </div>
+                </body>
+                </html>
+            `);
+            newWindow.document.close();
+            
+            showNotification(`${title} opened in new window`, 'info');
+        }
+        
+        // Initialize the app when DOM is loaded
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeApp);
+        } else {
+            initializeApp();
+        }
+    </script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/vcd15cbe7772f49c399c6a5babf22c1241717689176015" integrity="sha512-ZpsOmlRQV6y907TI0dKBHq9Md29nnaEIPlkf84rnaERnq6zvWvPUqr2ft8M1aS28oN72PdrCzSjY4U6VaAw1EQ==" data-cf-beacon='{"rayId":"97b9656bdc127fb0","serverTiming":{"name":{"cfExtPri":true,"cfEdge":true,"cfOrigin":true,"cfL4":true,"cfSpeedBrain":true,"cfCacheStatus":true}},"version":"2025.8.0","token":"4edd5f8ec12a48cfa682ab8261b80a79"}' crossorigin="anonymous"></script>
+</body>
+</html>
+    <script id="html_badge_script1">
+        window.__genspark_remove_badge_link = "https://www.genspark.ai/api/html_badge/" +
+            "remove_badge?token=To%2FBnjzloZ3UfQdcSaYfDtn0Tq9IEPny5RIIQe4GBaPUkHA20HE7X9e%2BCAuqdrIYG3UqpC49LR5MSA4SBCFEeiBZgauKsjBONAuKoXqbI2sNMbl1jUc4VmrRGI1wUDBQyOJGQczUN%2Bk5JXJMIIc3hyHkIut%2FRaVuDpHzA6T5Whna8LsEg5CWKihD8vdwGS9KP1t%2FJbDi9c9yMpXVG0EZOpzdZrjuUg5rysgV%2BOMROLcPs3V2Mm6wiBA3tExhQwdvrgVhfR6DWJEzIiAur8PhcYkRH2CSbXedCXc7xGYz543GRqAXdtz11QgzaW4LIlYw%2F00%2B585wmLwc%2B5QbIqgwr8v2SFEmnwbvqZfg83MxaKWBAA4ngeCryI%2Fg7%2F3ACJNT6P9aB8wse7sAVUleU%2F99A8pZWM5Pb0iPtROvYUX1eszcyGTkLFRIbbW9eQEVRjX4vadx%2BogRZeKNbzC9yio42Z5YY1axlhvQq%2FRj8dClJ9kfPsNnJyYmT4ZiD0VT5sXg7%2Frxc%2Fm1y5aoxyUfLdFPYQ%3D%3D";
+        window.__genspark_locale = "en-US";
+        window.__genspark_token = "To/BnjzloZ3UfQdcSaYfDtn0Tq9IEPny5RIIQe4GBaPUkHA20HE7X9e+CAuqdrIYG3UqpC49LR5MSA4SBCFEeiBZgauKsjBONAuKoXqbI2sNMbl1jUc4VmrRGI1wUDBQyOJGQczUN+k5JXJMIIc3hyHkIut/RaVuDpHzA6T5Whna8LsEg5CWKihD8vdwGS9KP1t/JbDi9c9yMpXVG0EZOpzdZrjuUg5rysgV+OMROLcPs3V2Mm6wiBA3tExhQwdvrgVhfR6DWJEzIiAur8PhcYkRH2CSbXedCXc7xGYz543GRqAXdtz11QgzaW4LIlYw/00+585wmLwc+5QbIqgwr8v2SFEmnwbvqZfg83MxaKWBAA4ngeCryI/g7/3ACJNT6P9aB8wse7sAVUleU/99A8pZWM5Pb0iPtROvYUX1eszcyGTkLFRIbbW9eQEVRjX4vadx+ogRZeKNbzC9yio42Z5YY1axlhvQq/Rj8dClJ9kfPsNnJyYmT4ZiD0VT5sXg7/rxc/m1y5aoxyUfLdFPYQ==";
+    </script>
+    
+    <script id="html_notice_dialog_script" src="https://www.genspark.ai/notice_dialog.js"></script>
+    
